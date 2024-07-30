@@ -25,9 +25,14 @@ import { useRedirect } from '../lib/useFromRedirect'
 
 const signupURL = 'https://signup.keystonejs.cloud/api/newsletter-signup'
 
-function Welcome ({ value, onContinue }: { value: any, onContinue: () => void }) {
+function extractEmail (value: string | undefined) {
+  if (value?.includes('@')) return value
+  return ''
+}
+
+function Welcome ({ value, onContinue }: { value: { username?: string }, onContinue: () => void }) {
   const [subscribe, setSubscribe] = useState(false)
-  const [email, setEmail] = useState<string>(value)
+  const [email, setEmail] = useState<string>(extractEmail(value?.username))
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -50,7 +55,6 @@ function Welcome ({ value, onContinue }: { value: any, onContinue: () => void })
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: value.username,
           email,
           source: '@keystone-6/auth InitPage',
         }),
