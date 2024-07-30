@@ -1,5 +1,4 @@
 import {
-  type AdminFileToWrite,
   type BaseListTypeInfo,
   type KeystoneConfig,
   type KeystoneContext,
@@ -54,21 +53,20 @@ export function createAuth<ListTypeInfo extends BaseListTypeInfo> ({
    * The signin page is always included, and the init page is included when initFirstItem is set
    */
   const authGetAdditionalFiles = () => {
-    const filesToWrite: AdminFileToWrite[] = [
+    return [
       {
-        mode: 'write',
+        mode: 'write' as const,
         src: signinTemplate({ gqlNames, identityField, secretField }),
         outputPath: 'pages/signin.js',
       },
+      ...(initFirstItem ? [
+        {
+          mode: 'write' as const,
+          src: initTemplate({ listKey, initFirstItem }),
+          outputPath: 'pages/init.js',
+        }
+      ] : [])
     ]
-    if (initFirstItem) {
-      filesToWrite.push({
-        mode: 'write',
-        src: initTemplate({ listKey, initFirstItem }),
-        outputPath: 'pages/init.js',
-      })
-    }
-    return filesToWrite
   }
 
   /**
