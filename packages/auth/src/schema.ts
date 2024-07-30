@@ -61,9 +61,7 @@ export const getSchemaExtension = ({
   sessionData: string
 }) =>
   graphql.extend(base => {
-    const uniqueWhereInputType = assertInputObjectType(
-      base.schema.getType(`${listKey}WhereUniqueInput`)
-    )
+    const uniqueWhereInputType = assertInputObjectType(base.schema.getType(`${listKey}WhereUniqueInput`))
     const identityFieldOnUniqueWhere = uniqueWhereInputType.getFields()[identityField]
     if (
       base.schema.extensions.sudo &&
@@ -98,18 +96,12 @@ export const getSchemaExtension = ({
     try {
       ast = parse(query)
     } catch (err) {
-      throw new Error(
-        `The query to get session data has a syntax error, the sessionData option in your createAuth usage is likely incorrect\n${err}`
-      )
+      throw new Error(`The query to get session data has a syntax error, the sessionData option in your createAuth usage is likely incorrect\n${err}`)
     }
 
     const errors = validate(base.schema, ast)
     if (errors.length) {
-      throw new Error(
-        `The query to get session data has validation errors, the sessionData option in your createAuth usage is likely incorrect\n${errors.join(
-          '\n'
-        )}`
-      )
+      throw new Error(`The query to get session data has validation errors, the sessionData option in your createAuth usage is likely incorrect\n${errors.join('\n')}`)
     }
 
     return [
@@ -118,7 +110,7 @@ export const getSchemaExtension = ({
         getInitFirstItemSchema({
           listKey,
           fields: initFirstItem.fields,
-          itemData: initFirstItem.itemData,
+          defaultItemData: initFirstItem.itemData,
           gqlNames,
           graphQLSchema: base.schema,
           ItemAuthenticationWithPasswordSuccess: baseSchema.ItemAuthenticationWithPasswordSuccess,
