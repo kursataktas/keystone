@@ -101,7 +101,7 @@ export function getBaseAuthSchema<I extends string, S extends string> ({
             where: { [identityField]: identity }
           })
 
-          if (!item || (typeof item[secretField] !== 'string')) {
+          if ((typeof item?.[secretField] !== 'string')) {
             await secretFieldImpl.generateHash('simulated-password-to-counter-timing-attack')
             return AUTHENTICATION_FAILURE
           }
