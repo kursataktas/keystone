@@ -1,10 +1,12 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-
 import { Component, type ReactNode } from 'react'
-import { Button } from '@keystone-ui/button'
-import { jsx, Box, Center, Stack, useTheme } from '@keystone-ui/core'
-import { AlertTriangleIcon } from '@keystone-ui/icons/icons/AlertTriangleIcon'
+
+import { Button } from '@keystar/ui/button'
+import { Icon } from '@keystar/ui/icon'
+import { alertTriangleIcon } from '@keystar/ui/icon/icons/alertTriangleIcon'
+import { Grid, VStack } from '@keystar/ui/layout'
+import { SlotProvider } from '@keystar/ui/slots'
+import { Heading, Text } from '@keystar/ui/typography'
+
 
 type ErrorBoundaryProps = {
   children: ReactNode
@@ -28,16 +30,20 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.state.hasError) {
       return (
         <ErrorContainer>
-          <Stack align="center" gap="medium">
-            <AlertTriangleIcon size="large" />
-            <div>Something went wrong.</div>
-            <Button size="small" isLoading={this.state.isReloading} onClick={this.reloadPage}>
-              reload page
-            </Button>
-          </Stack>
+          <Icon color="neutral" src={alertTriangleIcon} size="large" />
+          <Heading elementType="h1" margin={0}>Unknown error</Heading>
+          <Text>Something went wrong, please try reloading the page. If the problem persists contact your system administrator.</Text>
+          <Button
+            // isPending={this.state.isReloading}
+            prominence="high"
+            onPress={this.reloadPage}
+          >
+            Reload page
+          </Button>
         </ErrorContainer>
       )
     }
+
     return this.props.children
   }
 }
@@ -46,28 +52,28 @@ type ErrorContainerProps = {
   children: ReactNode
 }
 
+const errorContainerSlots = {
+  heading: { align: 'center', margin: 0 },
+  text: { align: 'center' }
+} as const
 export const ErrorContainer = ({ children }: ErrorContainerProps) => {
-  const { colors, shadow } = useTheme()
   return (
-    <Center
-      css={{
-        minWidth: '100vw',
-        minHeight: '100vh',
-        backgroundColor: colors.backgroundMuted,
-      }}
-      rounding="medium"
-    >
-      <Box
-        css={{
-          background: colors.background,
-          boxShadow: shadow.s100,
-        }}
-        margin="medium"
-        padding="xlarge"
-        rounding="medium"
+    <Grid minHeight="100vh" minWidth="100vw" alignItems="center" justifyContent="center">
+      <VStack
+        alignItems="center"
+        backgroundColor="canvas"
+        border="neutral"
+        borderRadius="large"
+        gap="xlarge"
+        margin="xlarge"
+        minWidth="container.xsmall"
+        maxWidth="container.small"
+        padding="xxlarge"
       >
-        {children}
-      </Box>
-    </Center>
+        <SlotProvider slots={errorContainerSlots}>
+          {children}
+        </SlotProvider>
+      </VStack>
+    </Grid>
   )
 }

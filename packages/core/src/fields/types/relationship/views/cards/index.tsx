@@ -1,7 +1,9 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
-import { type ReactNode } from 'react'
+import Link from 'next/link'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
+
 import {
   Box,
   type BoxProps,
@@ -12,18 +14,16 @@ import {
   forwardRefWithAs,
   VisuallyHidden,
 } from '@keystone-ui/core'
-
 import { FieldContainer, FieldLabel } from '@keystone-ui/fields'
 import { Button } from '@keystone-ui/button'
 import { Tooltip } from '@keystone-ui/tooltip'
 import { LoadingDots } from '@keystone-ui/loading'
-import { useEffect, useRef, useState } from 'react'
+
 import { type FieldProps, type ListMeta } from '../../../../../types'
 import {
   getRootGraphQLFieldsFromFieldController,
   makeDataGetter,
 } from '../../../../../admin-ui/utils'
-import { Link } from '../../../../../admin-ui/router'
 import { gql, useApolloClient } from '../../../../../admin-ui/apollo'
 import { type controller } from '../index'
 import { RelationshipSelect } from '../RelationshipSelect'
@@ -292,14 +292,12 @@ export function Cards ({
           >
             <RelationshipSelect
               autoFocus
-              controlShouldRenderValue={isLoadingLazyItems}
               isDisabled={onChange === undefined}
               list={foreignList}
               labelField={field.refLabelField}
               searchFields={field.refSearchFields}
               isLoading={isLoadingLazyItems}
               placeholder={`Select a ${foreignList.singular}`}
-              portalMenu
               state={{
                 kind: 'many',
                 async onChange (options) {

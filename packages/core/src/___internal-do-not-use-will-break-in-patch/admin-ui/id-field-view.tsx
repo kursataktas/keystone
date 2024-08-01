@@ -1,6 +1,8 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
+import { TextField } from '@keystar/ui/text-field'
+
 import { jsx } from '@keystone-ui/core'
 import { FieldContainer, FieldLabel, TextInput } from '@keystone-ui/fields'
 import type {
@@ -44,13 +46,19 @@ export function controller (
     serialize: () => ({}),
     filter: {
       Filter (props) {
+        const { autoFocus, context, onChange, type, typeLabel, value, ...otherProps } = props
+
+        const labelProps = context === 'add'
+          ? { label: config.label, description: typeLabel }
+          : { label: typeLabel }
+
         return (
-          <TextInput
-            onChange={event => {
-              props.onChange(event.target.value)
-            }}
-            value={props.value}
-            autoFocus={props.autoFocus}
+          <TextField
+            {...otherProps}
+            {...labelProps}
+            autoFocus={autoFocus}
+            onChange={onChange}
+            value={value}
           />
         )
       },

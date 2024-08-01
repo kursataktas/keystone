@@ -1,6 +1,7 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
+import Link from 'next/link'
 import { Fragment, useState } from 'react'
 
 import { Button } from '@keystone-ui/button'
@@ -15,7 +16,6 @@ import {
   type FieldProps,
   type ListMeta,
 } from '../../../../types'
-import { Link } from '../../../../admin-ui/router'
 import { useKeystone, useList } from '../../../../admin-ui/context'
 import { gql, useQuery } from '../../../../admin-ui/apollo'
 import { CellContainer, CreateItemDrawer } from '../../../../admin-ui/components'
@@ -129,14 +129,12 @@ export const Field = ({
       <Fragment>
         <Stack gap="medium">
           <RelationshipSelect
-            controlShouldRenderValue
             aria-describedby={field.description === null ? undefined : `${field.path}-description`}
             autoFocus={autoFocus}
             isDisabled={onChange === undefined}
             labelField={field.refLabelField}
             searchFields={field.refSearchFields}
             list={foreignList}
-            portalMenu
             state={
               value.kind === 'many'
                 ? {
@@ -510,7 +508,6 @@ export function controller (
         }
         return (
           <RelationshipSelect
-            controlShouldRenderValue
             list={foreignList}
             labelField={refLabelField}
             searchFields={refSearchFields}

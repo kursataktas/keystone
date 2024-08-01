@@ -1,5 +1,5 @@
 import type { GraphQLError } from 'graphql'
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import type { InitialisedList } from '../lib/core/initialise-lists'
 import type { JSONValue } from './utils'
 
@@ -65,10 +65,13 @@ export type FieldController<FormState, FilterValue extends JSONValue = never> = 
     graphql(type: { type: string, value: FilterValue }): Record<string, any>
     Label(type: FilterTypeToFormat<FilterValue>): string | ReactElement | null
     Filter(props: {
-      type: string
-      value: FilterValue
-      onChange(value: FilterValue): void
       autoFocus?: boolean
+      context: 'add' | 'edit'
+      onChange(value: FilterValue): void
+      type: string
+      // TODO: could be derived `filter.types[type].label`?
+      typeLabel?: string
+      value: FilterValue
     }): ReactElement | null
   }
 }

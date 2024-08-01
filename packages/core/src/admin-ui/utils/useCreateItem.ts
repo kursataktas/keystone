@@ -1,9 +1,12 @@
-import { useToasts } from '@keystone-ui/toast'
-import { type ComponentProps, useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import isDeepEqual from 'fast-deep-equal'
-import { useMutation, gql, type ApolloError } from '../apollo'
-import { useKeystone } from '..'
+import { useRouter } from 'next/router'
+import { type ComponentProps, useState, useMemo, useRef, useEffect, useCallback } from 'react'
+
+import { toastQueue } from '@keystar/ui/toast'
+
 import type { ListMeta } from '../../types'
+import { useMutation, gql, type ApolloError } from '../apollo'
+import { useKeystone } from '../context'
 import { usePreventNavigation } from './usePreventNavigation'
 import type { Fields, Value } from '.'
 
@@ -18,8 +21,8 @@ type CreateItemHookResult = {
 }
 
 export function useCreateItem (list: ListMeta): CreateItemHookResult {
-  const toasts = useToasts()
   const { createViewFieldModes } = useKeystone()
+  const router = useRouter()
 
   const [createItem, { loading, error, data: returnedData }] = useMutation(
     gql`mutation($data: ${list.gqlNames.createInputName}!) {
@@ -117,13 +120,18 @@ export function useCreateItem (list: ListMeta): CreateItemHookResult {
       } catch {
         return undefined
       }
+
       shouldPreventNavigationRef.current = false
-      const label = outputData.item.label || outputData.item.id
-      toasts.addToast({
-        title: label,
-        message: 'Created Successfully',
-        tone: 'positive',
+
+      toastQueue.positive(`${list.singular} created.`, {
+        timeout: 5000,
+        actionLabel: 'Add another',
+        onAction: () => {
+          router.push(`/${list.path}/create`)
+        },
+        shouldCloseOnAction: true,
       })
+
       return outputData.item
     },
   }
