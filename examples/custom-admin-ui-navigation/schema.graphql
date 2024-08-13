@@ -234,6 +234,7 @@ type KeystoneMeta {
 }
 
 type KeystoneAdminMeta {
+  endSession: Boolean!
   lists: [KeystoneAdminUIListMeta!]!
   list(key: String!): KeystoneAdminUIListMeta
 }
@@ -242,8 +243,6 @@ type KeystoneAdminUIListMeta {
   key: String!
   itemQueryName: String!
   listQueryName: String!
-  hideCreate: Boolean!
-  hideDelete: Boolean!
   path: String!
   label: String!
   singular: String!
@@ -258,6 +257,9 @@ type KeystoneAdminUIListMeta {
   initialSort: KeystoneAdminUISort
   isHidden: Boolean!
   isSingleton: Boolean!
+  hideNavigation: Boolean!
+  hideCreate: Boolean!
+  hideDelete: Boolean!
 }
 
 type KeystoneAdminUIFieldMeta {

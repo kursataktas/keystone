@@ -3,9 +3,9 @@
 
 import { jsx } from '@keystone-ui/core'
 import { Button } from '@keystone-ui/button'
-import { type ReactNode, useEffect } from 'react'
+import { useEffect } from 'react'
 
-import { useMutation, gql } from '../apollo'
+import { useMutation, gql } from '@keystone-6/core/admin-ui/apollo'
 
 const END_SESSION = gql`
   mutation EndSession {
@@ -13,7 +13,7 @@ const END_SESSION = gql`
   }
 `
 
-function SignoutButton ({ children }: { children?: ReactNode }) {
+export default function SignoutButton () {
   const [endSession, { loading, data }] = useMutation(END_SESSION)
   useEffect(() => {
     if (data?.endSession) {
@@ -21,10 +21,7 @@ function SignoutButton ({ children }: { children?: ReactNode }) {
     }
   }, [data])
 
-  return (
-    <Button size="small" isLoading={loading} onClick={() => endSession()}>
-      {children || 'Sign out'}
-    </Button>
-  )
+  return <Button size="small" isLoading={loading} onClick={() => endSession()}>
+    Sign out
+  </Button>
 }
-export { SignoutButton }

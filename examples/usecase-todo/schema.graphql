@@ -235,6 +235,7 @@ type KeystoneMeta {
 }
 
 type KeystoneAdminMeta {
+  authenticatedList(key: String!): KeystoneAdminUIListMeta
   lists: [KeystoneAdminUIListMeta!]!
   list(key: String!): KeystoneAdminUIListMeta
 }
