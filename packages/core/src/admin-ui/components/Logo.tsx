@@ -1,21 +1,17 @@
+import React from 'react'
 import Link from 'next/link'
-
 import { css, tokenSchema } from '@keystar/ui/style'
 import { Heading } from '@keystar/ui/typography'
 
 import { useKeystone } from '../context'
 
-export const Logo = () => {
+export function Logo () {
   const { adminConfig } = useKeystone()
-
-  if (adminConfig.components?.Logo) {
-    return <adminConfig.components.Logo />
-  }
-
+  if (adminConfig.components?.Logo) return <adminConfig.components.Logo />
   return <DefaultLogo />
 }
 
-const DefaultLogo = () => {
+function DefaultLogo () {
   return (
     <Heading
       elementType="div"
@@ -34,7 +30,7 @@ const DefaultLogo = () => {
           textDecorationColor: 'transparent',
           textDecorationThickness: tokenSchema.size.border.regular,
           textUnderlineOffset: tokenSchema.size.border.medium,
-  
+
           '&:hover, &:focus-visible': {
             color: tokenSchema.color.alias.foregroundHovered,
             textDecorationColor: 'currentColor',

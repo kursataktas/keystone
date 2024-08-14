@@ -1,5 +1,9 @@
+import React, {
+  type HTMLAttributes,
+  type ReactNode,
+  Fragment,
+} from 'react'
 import { useRouter } from 'next/router'
-import { Fragment, type HTMLAttributes, type ReactNode } from 'react'
 
 import { Breadcrumbs, Item } from '@keystar/ui/breadcrumbs'
 import { HStack } from '@keystar/ui/layout'
@@ -7,7 +11,7 @@ import { breakpointQueries, css, tokenSchema } from '@keystar/ui/style'
 import { Heading, Text } from '@keystar/ui/typography'
 
 import { Container } from '../../../../admin-ui/components/Container'
-import { type ListMeta } from '../../../../types'
+import type { ListMeta } from '../../../../types'
 
 type ItemPageHeaderProps = {
   label: string
@@ -33,7 +37,7 @@ export function ItemPageHeader (props: ItemPageHeaderProps) {
               {label}
             </Item>
           </Breadcrumbs>
-          
+
           {/* Every page must have an H1 for accessibility. */}
           <Text elementType="h1" visuallyHidden>
             {title}

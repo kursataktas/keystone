@@ -1,13 +1,11 @@
-import { useRouter } from 'next/router'
-import {
+import React, {
   type Key,
-  type HTMLAttributes,
-  type ReactNode,
   Fragment,
   useEffect,
   useMemo,
   useState
 } from 'react'
+import { useRouter } from 'next/router'
 
 import { ActionBar, ActionBarContainer, Item } from '@keystar/ui/action-bar'
 import { ActionButton } from '@keystar/ui/button'
@@ -17,7 +15,7 @@ import { textSelectIcon } from '@keystar/ui/icon/icons/textSelectIcon'
 import { searchXIcon } from '@keystar/ui/icon/icons/searchXIcon'
 import { trash2Icon } from '@keystar/ui/icon/icons/trash2Icon'
 import { undo2Icon } from '@keystar/ui/icon/icons/undo2Icon'
-import { Box, HStack, VStack } from '@keystar/ui/layout'
+import { HStack, VStack } from '@keystar/ui/layout'
 import { ProgressCircle } from '@keystar/ui/progress'
 import { SearchField } from '@keystar/ui/search-field'
 import { css, tokenSchema } from '@keystar/ui/style'
@@ -34,21 +32,12 @@ import { toastQueue } from '@keystar/ui/toast'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
 import { Heading, Text } from '@keystar/ui/typography'
 
-import { Button } from '@keystone-ui/button'
-import { jsx, useTheme } from '@keystone-ui/core'
-import { CheckboxControl } from '@keystone-ui/fields'
-import { ArrowRightCircleIcon } from '@keystone-ui/icons/icons/ArrowRightCircleIcon'
-import { useToasts } from '@keystone-ui/toast'
-
-import { type ListMeta } from '../../../../types'
 import {
-  getRootGraphQLFieldsFromFieldController,
   type DataGetter,
   type DeepNullable,
   makeDataGetter,
 } from '../../../../admin-ui/utils'
 import { gql, type TypedDocumentNode, useMutation, useQuery } from '../../../../admin-ui/apollo'
-import { CellLink } from '../../../../admin-ui/components'
 import { PageContainer } from '../../../../admin-ui/components/PageContainer'
 import { useList } from '../../../../admin-ui/context'
 import { EmptyState } from '../../../../admin-ui/components/EmptyState'
@@ -276,10 +265,10 @@ function ListPage ({ listKey }: ListPageProps) {
       {error?.graphQLErrors.length || error?.networkError ? (
         <GraphQLErrorNotice errors={error?.graphQLErrors} networkError={error?.networkError} />
       ) : null}
-      
+
       {/* FIXME: consolidate error messages. */}
       {/* {metaQuery.error ? 'Error...' : null} */}
-      
+
       {data && metaQuery.data ? (
         <VStack flex gap="large" paddingY="xlarge" minHeight={0} minWidth={0}>
           {/* FIXME: this is really weird; not sure where it should live. */}
@@ -380,12 +369,7 @@ function ListTable ({
 }) {
   const list = useList(listKey)
   const router = useRouter()
-  const shouldShowLinkIcon =
-    !list.fields[selectedFields.keys().next().value].views.Cell.supportsLinkTo
-
-  // New stuff
-  const [selectedKeys, setSelectedKeys] = useState<SelectedKeys>(() => new Set([])
-  )
+  const [selectedKeys, setSelectedKeys] = useState<SelectedKeys>(() => new Set([]))
   const onSortChange = (sortDescriptor: SortDescriptor) => {
     const sortBy = sortDescriptor.direction === 'ascending' ? `-${sortDescriptor.column}` : sortDescriptor.column
     router.push({ query: { ...router.query, sortBy } })
@@ -453,9 +437,8 @@ function ListTable ({
               return (
                 <Row href={`/${list.path}/${row?.id}`}>
                   {key => {
-                    const field = list.fields[key]
-                    const CellValue = field.views.Cell
-
+                    // TODO: FIXME
+                    // const field = list.fields[key]
                     return (
                       <Cell>
                         {row[key]?.toString()}
@@ -476,7 +459,7 @@ function ListTable ({
                     )
                   }}
               </Row>
-            ) 
+            )
           }}
           </TableBody>
         </TableView>
@@ -504,7 +487,7 @@ function ListTable ({
                       ids.push(item.id)
                     }
                   }
-                  
+
                   setIdsForDeletion(new Set(ids))
                 } else {
                   setIdsForDeletion(selectedKeys)
@@ -556,7 +539,7 @@ function parseSortQuery (queryString?: string | string[]): SortDescriptor {
 
   const column = queryString.startsWith('-') ? queryString.slice(1) : queryString
   const direction = queryString.startsWith('-') ? 'ascending' : 'descending'
-  
+
   return { column, direction }
 }
 
@@ -564,7 +547,7 @@ function DeleteItemsDialog (props: { items: Set<Key>, listKey: string, refetch: 
   const { items, listKey, refetch } = props
   const list = useList(listKey)
 
-  const [deleteItems, deleteItemsState] = useMutation(
+  const [deleteItems] = useMutation(
     useMemo(
       () =>
         gql`
@@ -590,7 +573,7 @@ function DeleteItemsDialog (props: { items: Set<Key>, listKey: string, refetch: 
       Run a reduce to count success and failure as well as
       to generate the success message to be passed to the success toast
      */
-    const { successfulItems, unsuccessfulItems, successMessage } = data[
+    const { successfulItems, unsuccessfulItems } = data[
       list.gqlNames.deleteManyMutationName
     ].reduce(
       (

@@ -1,10 +1,8 @@
+import React from 'react'
 import { Badge } from '@keystar/ui/badge'
 import { Checkbox } from '@keystar/ui/checkbox'
-import { FieldLabel } from '@keystar/ui/field'
-import { VStack } from '@keystar/ui/layout'
 import { Text } from '@keystar/ui/typography'
 
-import { jsx, useTheme } from '@keystone-ui/core'
 import type {
   CellComponent,
   FieldController,

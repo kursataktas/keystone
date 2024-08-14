@@ -1,3 +1,4 @@
+import React from 'react'
 import { Icon } from '@keystar/ui/icon'
 import { shieldAlertIcon } from '@keystar/ui/icon/icons/shieldAlertIcon'
 import { Heading, Text } from '@keystar/ui/typography'
@@ -9,7 +10,7 @@ type NoAccessPage = { sessionsEnabled: boolean }
 
 export const getNoAccessPage = (props: NoAccessPage) => () => <NoAccessPage {...props} />
 
-export const NoAccessPage = ({ sessionsEnabled }: NoAccessPage) => {
+export function NoAccessPage ({ sessionsEnabled }: NoAccessPage) {
   return (
     <ErrorContainer>
       <Icon color="neutral" src={shieldAlertIcon} size="large" />

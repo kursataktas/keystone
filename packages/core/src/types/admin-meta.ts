@@ -1,5 +1,5 @@
 import type { GraphQLError } from 'graphql'
-import type { ReactElement, ReactNode } from 'react'
+import type { ReactElement } from 'react'
 import type { InitialisedList } from '../lib/core/initialise-lists'
 import type { JSONValue } from './utils'
 

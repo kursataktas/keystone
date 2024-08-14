@@ -4,7 +4,6 @@
 import { TextField } from '@keystar/ui/text-field'
 
 import { jsx } from '@keystone-ui/core'
-import { TextInput } from '@keystone-ui/fields'
 import type {
   CellComponent,
   FieldController,

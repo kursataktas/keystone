@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import React, { type Key, type ReactNode, useEffect, useId, useMemo } from 'react'
+import React, { type Key, useEffect, useMemo } from 'react'
 
 import { ActionButton } from '@keystar/ui/button'
 import { Icon } from '@keystar/ui/icon'
@@ -7,9 +7,7 @@ import { chevronLeftIcon } from '@keystar/ui/icon/icons/chevronLeftIcon'
 import { chevronRightIcon } from '@keystar/ui/icon/icons/chevronRightIcon'
 import { HStack } from '@keystar/ui/layout'
 import { Item, Picker } from '@keystar/ui/picker'
-import { css, tokenSchema } from '@keystar/ui/style'
 import { Text } from '@keystar/ui/typography'
-import { composeId } from '@keystar/ui/utils'
 
 type PaginationProps = {
   pageSize: number

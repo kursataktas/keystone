@@ -25,9 +25,7 @@ export function Field ({
   const inputProps = useFormattedInput<Decimal | null>(
     {
       format (decimal) {
-        if (decimal === null) {
-          return ''
-        }
+        if (decimal === null) return ''
 
         return decimal.toFixed(field.scale)
       },

@@ -41,13 +41,11 @@ function LinkToRelatedItems ({
     itemId: string | null
     value: FieldProps<typeof controller>['value'] & { kind: 'many' | 'one' }
   }) {
-    if (!!refFieldKey && itemId) {
-      return `!${refFieldKey}_matches="${itemId}"`
-    }
-    return `!id_in="${(value?.value as { id: string, label: string }[])
-      .slice(0, 100)
-      .map(({ id }: { id: string }) => id)
-      .join(',')}"`
+    if (!!refFieldKey && itemId) return `!${refFieldKey}_matches="${itemId}"`
+    if (!Array.isArray(value.value)) throw new TypeError('bad query value')
+
+    const ids = value.value.slice(0, 100).map(({ id }) => id)
+    return `!id_in=${ids.join(',')}"`
   }
   const commonProps = {
     size: 'small',
@@ -461,10 +459,11 @@ export function controller (
       if (state.kind === 'many') {
         const newAllIds = new Set(state.value.map(x => x.id))
         const initialIds = new Set(state.initialValue.map(x => x.id))
-        let disconnect = state.initialValue
+        const disconnect = state.initialValue
           .filter(x => !newAllIds.has(x.id))
           .map(x => ({ id: x.id }))
-        let connect = state.value.filter(x => !initialIds.has(x.id)).map(x => ({ id: x.id }))
+
+        const connect = state.value.filter(x => !initialIds.has(x.id)).map(x => ({ id: x.id }))
         if (disconnect.length || connect.length) {
           let output: any = {}
 
@@ -481,9 +480,8 @@ export function controller (
           }
         }
       } else if (state.kind === 'one') {
-        if (state.initialValue && !state.value) {
-          return { [config.path]: { disconnect: true } }
-        } else if (state.value && state.value.id !== state.initialValue?.id) {
+        if (state.initialValue && !state.value) return { [config.path]: { disconnect: true } }
+        if (state.value && state.value.id !== state.initialValue?.id) {
           return {
             [config.path]: {
               connect: {
@@ -501,7 +499,6 @@ export function controller (
 function useRelationshipFilterValues ({ value, list }: { value: string, list: ListMeta }) {
   const foreignIds = getForeignIds(value)
   const where = { id: { in: foreignIds } }
-
   const query = gql`
     query FOREIGNLIST_QUERY($where: ${list.gqlNames.whereInputName}!) {
       items: ${list.gqlNames.listQueryName}(where: $where) {
@@ -530,8 +527,6 @@ function useRelationshipFilterValues ({ value, list }: { value: string, list: Li
 }
 
 function getForeignIds (value: string) {
-  if (typeof value === 'string' && value.length > 0) {
-    return value.split(',')
-  }
+  if (typeof value === 'string' && value.length > 0) return value.split(',')
   return []
 }

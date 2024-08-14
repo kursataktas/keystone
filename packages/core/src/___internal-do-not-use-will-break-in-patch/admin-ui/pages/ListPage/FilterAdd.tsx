@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router'
-import { type FormEvent, Fragment, useMemo, useState, useRef } from 'react'
+import React, { type FormEvent, Fragment, useMemo, useState, useRef } from 'react'
 
 import { ActionButton, ButtonGroup, Button } from '@keystar/ui/button'
 import { Dialog, DialogTrigger } from '@keystar/ui/dialog'
 import { Icon } from '@keystar/ui/icon'
 import { chevronDownIcon } from '@keystar/ui/icon/icons/chevronDownIcon'
-import { Grid, VStack } from '@keystar/ui/layout'
+import { Grid } from '@keystar/ui/layout'
 import { MenuTrigger, Menu, Item } from '@keystar/ui/menu'
 import { Picker } from '@keystar/ui/picker'
 import { Content } from '@keystar/ui/slots'
@@ -117,7 +117,7 @@ export function FilterAdd (props: {
       </DialogTrigger>
     )
   }
-  
+
   return (
     <Fragment>
       <MenuTrigger>

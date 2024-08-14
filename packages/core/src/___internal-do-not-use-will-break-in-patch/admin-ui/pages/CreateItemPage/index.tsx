@@ -1,8 +1,8 @@
+import React from 'react'
 import { useRouter } from 'next/router'
 
 import { Button } from '@keystar/ui/button'
 import { VStack } from '@keystar/ui/layout'
-
 import { LoadingDots } from '@keystone-ui/loading'
 
 import { Fields } from '../../../../admin-ui/utils'
@@ -14,8 +14,7 @@ import { BaseToolbar, ColumnLayout, ItemPageHeader } from '../ItemPage/common'
 
 type CreateItemPageProps = { listKey: string }
 
-export const getCreateItemPage = (props: CreateItemPageProps) => () =>
-  <CreateItemPage {...props} />
+export const getCreateItemPage = (props: CreateItemPageProps) => () => <CreateItemPage {...props} />
 
 function CreateItemPage (props: CreateItemPageProps) {
   const router = useRouter()

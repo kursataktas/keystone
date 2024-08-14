@@ -10,7 +10,6 @@ export { ErrorBoundary, ErrorContainer } from './Errors'
 export { Logo } from './Logo'
 export {
   ListNavItems,
-  NavDivider,
   NavGroup,
   NavigationContainer,
   NavItem,

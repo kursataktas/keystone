@@ -1,4 +1,4 @@
-import { type Key, useMemo, useRef, useState } from 'react'
+import React, { type Key, useMemo, useRef, useState } from 'react'
 import { useListFormatter } from '@react-aria/i18n'
 
 import { ListView } from '@keystar/ui/list-view'
@@ -7,7 +7,6 @@ import { VStack } from '@keystar/ui/layout'
 import { Item, Picker } from '@keystar/ui/picker'
 import { Radio, RadioGroup } from '@keystar/ui/radio'
 import { tokenSchema } from '@keystar/ui/style'
-import { Text } from '@keystar/ui/typography'
 
 import { NullableFieldWrapper } from '../../../../admin-ui/components'
 import { SegmentedControl } from './SegmentedControl'

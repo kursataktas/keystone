@@ -1,4 +1,4 @@
-import { type ReactNode, Fragment, useMemo } from 'react'
+import React, { type ReactNode, Fragment, useMemo } from 'react'
 import { useRouter } from 'next/router'
 
 import { ActionButton } from '@keystar/ui/button'
@@ -8,8 +8,8 @@ import { constructionIcon } from '@keystar/ui/icon/icons/constructionIcon'
 import { githubIcon } from '@keystar/ui/icon/icons/githubIcon'
 import { fileJson2Icon } from '@keystar/ui/icon/icons/fileJson2Icon'
 import { MenuTrigger, Menu, Item } from '@keystar/ui/menu'
-import { Box, Divider, HStack, VStack } from '@keystar/ui/layout'
-import { NavList, NavItem as KeystarNavItem, NavGroup as KeystarNavGroup } from '@keystar/ui/nav-list'
+import { Box, HStack, VStack } from '@keystar/ui/layout'
+import { NavList, NavItem as KeystarNavItem } from '@keystar/ui/nav-list'
 import { Notice } from '@keystar/ui/notice'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
 import { Text } from '@keystar/ui/typography'
@@ -51,20 +51,20 @@ type ListNavItemsProps = Pick<NavigationProps, 'lists'> & {
  * Group related navigation items together into categories, under a
  * common title.
  */
-export const NavGroup = KeystarNavGroup
+export { NavGroup } from '@keystar/ui/nav-list'
+
 
 /**
  * Dividers can be used to separate navigation items. Prefer `NavGroup` for
  * grouping related items under a common title.
  */
-export const NavDivider = Divider
-
+import { Divider } from '@keystar/ui/layout'
 
 /**
  * A navigation item represents a page in the admin UI. Prefer `ListNavItems`
  * for managing navigation between lists.
 */
-export const NavItem = (props: NavItemProps) => {
+export function NavItem (props: NavItemProps) {
   const { children, href, isSelected: isSelectedProp } = props
   const router = useRouter()
 
@@ -93,7 +93,7 @@ export const NavItem = (props: NavItemProps) => {
  * markup around navigation items, as well as the different states of
  * the `authenticatedItem` element.
 */
-export const NavigationContainer = ({ authenticatedItem, children }: NavigationContainerProps) => {
+export function NavigationContainer ({ authenticatedItem, children }: NavigationContainerProps) {
   return (
     <VStack gap="large" height="100%" paddingY="xlarge">
       <NavList aria-label="main" flex marginEnd="medium">
@@ -108,7 +108,7 @@ export const NavigationContainer = ({ authenticatedItem, children }: NavigationC
  * Render navigation items for the provided lists. Optionally filter the lists
  * to include only those with specific keys.
  */
-export const ListNavItems = ({ lists = [], include = [] }: ListNavItemsProps) => {
+export function ListNavItems ({ lists = [], include = [] }: ListNavItemsProps) {
   const filteredLists = useMemo(() => {
     if (include.length === 0) {
       return lists
@@ -130,7 +130,7 @@ export const ListNavItems = ({ lists = [], include = [] }: ListNavItemsProps) =>
 /**
  * @private Exported for internal consumption only.
 */
-export const Navigation = () => {
+export function Navigation () {
   const {
     adminMeta: { lists },
     adminConfig,

@@ -1,9 +1,5 @@
-import { useState } from 'react'
-
-import { FieldLabel } from '@keystar/ui/field'
-import { VStack } from '@keystar/ui/layout'
+import React, { useState } from 'react'
 import { TextArea, TextField } from '@keystar/ui/text-field'
-import { Text } from '@keystar/ui/typography'
 
 import type {
   CellComponent,
@@ -12,7 +8,7 @@ import type {
   FieldProps,
 } from '../../../../types'
 import { CellContainer, CellLink, NullableFieldWrapper } from '../../../../admin-ui/components'
-import { type TextFieldMeta } from '..'
+import type { TextFieldMeta } from '..'
 
 export function Field (props: FieldProps<typeof controller>) {
   const { autoFocus, field, forceValidation, onChange, value } = props

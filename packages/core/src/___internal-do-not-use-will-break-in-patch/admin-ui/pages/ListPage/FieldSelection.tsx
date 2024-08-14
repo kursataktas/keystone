@@ -1,5 +1,8 @@
+import React, {
+  type Key,
+  useMemo,
+} from 'react'
 import { useRouter } from 'next/router'
-import { useMemo, type Key } from 'react'
 
 import { ActionButton } from '@keystar/ui/button'
 import { Icon } from '@keystar/ui/icon'
@@ -7,7 +10,7 @@ import { chevronDownIcon } from '@keystar/ui/icon/icons/chevronDownIcon'
 import { MenuTrigger, Menu, Item } from '@keystar/ui/menu'
 import { Text } from '@keystar/ui/typography'
 
-import { type ListMeta } from '../../../../types'
+import type { ListMeta } from '../../../../types'
 import { useSelectedFields } from './useSelectedFields'
 
 export function FieldSelection ({
@@ -41,7 +44,7 @@ export function FieldSelection ({
         isDisabled: selectedFields.size === 1 && selectedFields.has(fieldPath),
       }))
   }, [fieldModesByFieldPath, list.fields, selectedFields])
-  
+
   return (
     <MenuTrigger>
       <ActionButton isDisabled={isDisabled}>

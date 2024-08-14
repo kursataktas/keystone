@@ -1,6 +1,4 @@
-import copyToClipboard from 'clipboard-copy'
-import { useRouter } from 'next/router'
-import {
+import React, {
   type PropsWithChildren,
   type ReactElement,
   Fragment,
@@ -11,6 +9,8 @@ import {
   useRef,
   useState,
 } from 'react'
+import copyToClipboard from 'clipboard-copy'
+import { useRouter } from 'next/router'
 
 import { ActionButton, Button } from '@keystar/ui/button'
 import { Icon } from '@keystar/ui/icon'
@@ -31,12 +31,12 @@ import type { ListMeta, FieldMeta } from '../../../../types'
 import {
   type DataGetter,
   type DeepNullable,
-  makeDataGetter,
-  deserializeValue,
   type ItemData,
-  useInvalidFields,
   Fields,
+  deserializeValue,
+  makeDataGetter,
   useChangedFieldsAndDataForUpdate,
+  useInvalidFields,
 } from '../../../../admin-ui/utils'
 import { gql, useMutation, useQuery } from '../../../../admin-ui/apollo'
 import { useList } from '../../../../admin-ui/context'
@@ -137,9 +137,7 @@ function ItemForm ({
         if (error) {
           toastQueue.critical('Unable to save item.', {
             actionLabel: 'Details',
-            onAction: () => {
-              setErrorDialogValue(error)
-            },
+            onAction: () => setErrorDialogValue(new Error(error.message)),
             shouldCloseOnAction: true,
           })
         } else {

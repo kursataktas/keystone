@@ -1,5 +1,5 @@
 import 'intersection-observer'
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Combobox, Item } from '@keystar/ui/combobox'
 
 import { type ListMeta } from '../../../../types'
@@ -45,7 +45,6 @@ export function useFilter (value: string, list: ListMeta, searchFields: string[]
 
     const conditions: Record<string, any>[] = []
     const idField = list.fields.id.fieldMeta as { type: string, kind: string }
-    console.error({ idField, value, meta: list.fields.id.fieldMeta })
 
     if (idField.type === 'String') {
       // TODO: remove in breaking change?
