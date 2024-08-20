@@ -23,15 +23,15 @@ import {
   type FieldProps,
   type ListMeta,
 } from '../../../../types'
-import { useKeystone, useList } from '../../../../admin-ui/context'
+import { useList } from '../../../../admin-ui/context'
 import { gql, useQuery } from '../../../../admin-ui/apollo'
 import { CellContainer, CreateItemDrawer } from '../../../../admin-ui/components'
 
 import { RelationshipSelect } from './RelationshipSelect'
 
 export function Field (props: FieldProps<typeof controller>) {
-  const { field, value, itemValue, autoFocus, onChange, forceValidation } = props
-  const keystone = useKeystone()
+  const { field, value, autoFocus, onChange } = props
+
   const foreignList = useList(field.refListKey)
   const localList = useList(field.listKey)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
