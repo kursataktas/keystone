@@ -146,7 +146,6 @@ export type FieldViews = Record<
   {
     Field: (props: FieldProps<any>) => ReactElement | null
     Cell: CellComponent
-    CardValue: CardValueComponent
     controller: (args: FieldControllerConfig<any>) => FieldController<unknown, JSONValue>
     allowedExportsOnCustomViews?: string[]
   }
@@ -166,10 +165,3 @@ export type CellComponent<
 
   supportsLinkTo?: boolean
 }
-
-export type CardValueComponent<
-  FieldControllerFn extends (...args: any) => FieldController<any, any> = () => FieldController<
-    any,
-    any
-  >
-> = (props: { item: Record<string, any>, field: ReturnType<FieldControllerFn> }) => ReactElement

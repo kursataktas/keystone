@@ -10,7 +10,7 @@ import {
   staticAdminMetaQuery
 } from '../admin-meta-graphql'
 
-const expectedExports = new Set(['Cell', 'Field', 'controller', 'CardValue'])
+const expectedExports = new Set(['Cell', 'Field', 'controller'])
 const adminMetaLocalStorageKey = 'keystone.adminMeta'
 
 let _mustRenderServerResult = true

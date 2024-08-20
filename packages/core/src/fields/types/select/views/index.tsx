@@ -13,7 +13,6 @@ import { NullableFieldWrapper } from '../../../../admin-ui/components'
 import { SegmentedControl } from './SegmentedControl'
 
 import type {
-  CardValueComponent,
   CellComponent,
   FieldController,
   FieldControllerConfig,
@@ -32,7 +31,7 @@ export const Field = (props: FieldProps<typeof controller>) => {
       return item.label.length > acc ? item.label.length : acc
     }, 0)
   }, [field.options])
-  
+
   const selectedKey = value.value?.value || preNullValue?.value || null
   const isNullable = !field.isRequired
   const isNull = isNullable && value.value?.value == null
@@ -138,7 +137,7 @@ export const Field = (props: FieldProps<typeof controller>) => {
             )}
           </Picker>
         )
-    } 
+    }
   })()
 
 
@@ -162,18 +161,6 @@ export const Cell: CellComponent<typeof controller> = ({ item, field, linkTo }) 
   return linkTo ? <CellLink {...linkTo}>{label}</CellLink> : <CellContainer>{label}</CellContainer>
 }
 Cell.supportsLinkTo = true
-
-export const CardValue: CardValueComponent<typeof controller> = ({ item, field }) => {
-  let value = item[field.path] + ''
-  const valueLabel = field.options.find(x => x.value === value)?.label
-
-  return (
-    <VStack elementType="dl" gap="medium">
-      <FieldLabel elementType="dt">{field.label}</FieldLabel>
-      <Text elementType="dd" color="neutralEmphasis">{valueLabel}</Text>
-    </VStack>
-  )
-}
 
 export type AdminSelectFieldMeta = {
   options: readonly { label: string, value: string | number }[]
@@ -323,7 +310,7 @@ export const controller = (
         if (value.length === 0) {
           return type === 'not_matches' ? `is set` : `is not set`
         }
-        
+
         const labels = value.map(i => i.label)
         const prefix = type === 'not_matches' ? `is not` : `is`
 
@@ -331,7 +318,7 @@ export const controller = (
           return `${prefix} ${labels[0]}`
         }
         if (value.length === 2) {
-          return `${prefix} ${listFormatter.format(labels)}` 
+          return `${prefix} ${listFormatter.format(labels)}`
         }
 
         return `${prefix} ${listFormatter.format([labels[0], `${value.length - 1} more`])}`

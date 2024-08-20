@@ -4,9 +4,8 @@
 import { TextField } from '@keystar/ui/text-field'
 
 import { jsx } from '@keystone-ui/core'
-import { FieldContainer, FieldLabel, TextInput } from '@keystone-ui/fields'
+import { TextInput } from '@keystone-ui/fields'
 import type {
-  CardValueComponent,
   CellComponent,
   FieldController,
   FieldControllerConfig,
@@ -23,15 +22,6 @@ export const Cell: CellComponent = ({ item, field, linkTo }) => {
   return linkTo ? <CellLink {...linkTo}>{value}</CellLink> : <CellContainer>{value}</CellContainer>
 }
 Cell.supportsLinkTo = true
-
-export const CardValue: CardValueComponent = ({ item, field }) => {
-  return (
-    <FieldContainer>
-      <FieldLabel>{field.label}</FieldLabel>
-      {item[field.path]}
-    </FieldContainer>
-  )
-}
 
 export function controller (
   config: FieldControllerConfig<IdFieldConfig>

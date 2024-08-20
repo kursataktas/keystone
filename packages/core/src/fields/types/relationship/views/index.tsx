@@ -9,7 +9,6 @@ import { jsx, Stack, useTheme } from '@keystone-ui/core'
 import { FieldContainer, FieldDescription, FieldLabel, FieldLegend } from '@keystone-ui/fields'
 import { DrawerController } from '@keystone-ui/modals'
 import {
-  type CardValueComponent,
   type CellComponent,
   type FieldController,
   type FieldControllerConfig,
@@ -20,7 +19,6 @@ import { useKeystone, useList } from '../../../../admin-ui/context'
 import { gql, useQuery } from '../../../../admin-ui/apollo'
 import { CellContainer, CreateItemDrawer } from '../../../../admin-ui/components'
 
-import { Cards } from './cards'
 import { RelationshipSelect } from './RelationshipSelect'
 
 function LinkToRelatedItems ({
@@ -85,25 +83,6 @@ export const Field = ({
   const foreignList = useList(field.refListKey)
   const localList = useList(field.listKey)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
-  if (value.kind === 'cards-view') {
-    return (
-      <FieldContainer as="fieldset">
-        <FieldLegend>{field.label}</FieldLegend>
-        <FieldDescription id={`${field.path}-description`}>{field.description}</FieldDescription>
-        <Cards
-          forceValidation={forceValidation}
-          field={field}
-          id={value.id}
-          value={value}
-          itemValue={itemValue}
-          onChange={onChange}
-          foreignList={foreignList}
-          localList={localList}
-        />
-      </FieldContainer>
-    )
-  }
 
   if (value.kind === 'count') {
     return (
@@ -285,26 +264,6 @@ export const Cell: CellComponent<typeof controller> = ({ field, item }) => {
   )
 }
 
-export const CardValue: CardValueComponent<typeof controller> = ({ field, item }) => {
-  const list = useList(field.refListKey)
-  const data = item[field.path]
-  return (
-    <FieldContainer>
-      <FieldLabel>{field.label}</FieldLabel>
-      {(Array.isArray(data) ? data : [data])
-        .filter(item => item)
-        .map((item, index) => (
-          <Fragment key={item.id}>
-            {!!index ? ', ' : ''}
-            <Link href={`/${list.path}/[id]`} as={`/${list.path}/${item.id}`}>
-              {item.label || item.id}
-            </Link>
-          </Fragment>
-        ))}
-    </FieldContainer>
-  )
-}
-
 type SingleRelationshipValue = {
   kind: 'one'
   id: null | string
@@ -317,34 +276,17 @@ type ManyRelationshipValue = {
   initialValue: { label: string, id: string }[]
   value: { label: string, id: string }[]
 }
-type CardsRelationshipValue = {
-  kind: 'cards-view'
-  id: null | string
-  itemsBeingEdited: ReadonlySet<string>
-  itemBeingCreated: boolean
-  initialIds: ReadonlySet<string>
-  currentIds: ReadonlySet<string>
-  displayOptions: CardsDisplayModeOptions
-}
 type CountRelationshipValue = {
   kind: 'count'
   id: null | string
   count: number
 }
-type CardsDisplayModeOptions = {
-  cardFields: readonly string[]
-  linkToItem: boolean
-  removeMode: 'disconnect' | 'none'
-  inlineCreate: { fields: readonly string[] } | null
-  inlineEdit: { fields: readonly string[] } | null
-  inlineConnect: boolean
-}
 
 type RelationshipController = FieldController<
-  ManyRelationshipValue | SingleRelationshipValue | CardsRelationshipValue | CountRelationshipValue,
+  ManyRelationshipValue | SingleRelationshipValue | CountRelationshipValue,
   string
 > & {
-  display: 'count' | 'cards-or-select'
+  display: 'select' | 'count'
   listKey: string
   refListKey: string
   refFieldKey?: string
@@ -368,32 +310,11 @@ export function controller (
           displayMode: 'select'
         }
       | {
-          displayMode: 'cards'
-          cardFields: readonly string[]
-          linkToItem: boolean
-          removeMode: 'disconnect' | 'none'
-          inlineCreate: { fields: readonly string[] } | null
-          inlineEdit: { fields: readonly string[] } | null
-          inlineConnect: boolean
-        }
-      | {
           displayMode: 'count'
         }
     )
   >
 ): RelationshipController {
-  const cardsDisplayOptions =
-    config.fieldMeta.displayMode === 'cards'
-      ? {
-          cardFields: config.fieldMeta.cardFields,
-          inlineCreate: config.fieldMeta.inlineCreate,
-          inlineEdit: config.fieldMeta.inlineEdit,
-          linkToItem: config.fieldMeta.linkToItem,
-          removeMode: config.fieldMeta.removeMode,
-          inlineConnect: config.fieldMeta.inlineConnect,
-        }
-      : undefined
-
   const refLabelField = config.fieldMeta.refLabelField
   const refSearchFields = config.fieldMeta.refSearchFields
 
@@ -404,7 +325,7 @@ export function controller (
     path: config.path,
     label: config.label,
     description: config.description,
-    display: config.fieldMeta.displayMode === 'count' ? 'count' : 'cards-or-select',
+    display: config.fieldMeta.displayMode,
     refLabelField,
     refSearchFields,
     refListKey: config.fieldMeta.refListKey,
@@ -421,17 +342,7 @@ export function controller (
     // because our other UIs don't handle relationships with a large number of items well
     // but that's not a problem here since we're creating a new item so we might as well them a better UI
     defaultValue:
-      cardsDisplayOptions !== undefined
-        ? {
-            kind: 'cards-view',
-            currentIds: new Set(),
-            id: null,
-            initialIds: new Set(),
-            itemBeingCreated: false,
-            itemsBeingEdited: new Set(),
-            displayOptions: cardsDisplayOptions,
-          }
-        : config.fieldMeta.many
+      config.fieldMeta.many
         ? {
             id: null,
             kind: 'many',
@@ -442,25 +353,6 @@ export function controller (
     deserialize: data => {
       if (config.fieldMeta.displayMode === 'count') {
         return { id: data.id, kind: 'count', count: data[`${config.path}Count`] ?? 0 }
-      }
-      if (cardsDisplayOptions !== undefined) {
-        const initialIds = new Set<string>(
-          (Array.isArray(data[config.path])
-            ? data[config.path]
-            : data[config.path]
-            ? [data[config.path]]
-            : []
-          ).map((x: any) => x.id)
-        )
-        return {
-          kind: 'cards-view',
-          id: data.id,
-          itemsBeingEdited: new Set(),
-          itemBeingCreated: false,
-          initialIds,
-          currentIds: initialIds,
-          displayOptions: cardsDisplayOptions,
-        }
       }
       if (config.fieldMeta.many) {
         let value = (data[config.path] || []).map((x: any) => ({
@@ -563,10 +455,7 @@ export function controller (
       },
     },
     validate (value) {
-      return (
-        value.kind !== 'cards-view' ||
-        (value.itemsBeingEdited.size === 0 && !value.itemBeingCreated)
-      )
+      return true
     },
     serialize: state => {
       if (state.kind === 'many') {
@@ -602,32 +491,6 @@ export function controller (
               },
             },
           }
-        }
-      } else if (state.kind === 'cards-view') {
-        let disconnect = [...state.initialIds]
-          .filter(id => !state.currentIds.has(id))
-          .map(id => ({ id }))
-        let connect = [...state.currentIds]
-          .filter(id => !state.initialIds.has(id))
-          .map(id => ({ id }))
-
-        if (config.fieldMeta.many) {
-          if (disconnect.length || connect.length) {
-            return {
-              [config.path]: {
-                connect: connect.length ? connect : undefined,
-                disconnect: disconnect.length ? disconnect : undefined,
-              },
-            }
-          }
-        } else if (connect.length) {
-          return {
-            [config.path]: {
-              connect: connect[0],
-            },
-          }
-        } else if (disconnect.length) {
-          return { [config.path]: { disconnect: true } }
         }
       }
       return {}

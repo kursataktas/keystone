@@ -72,16 +72,6 @@ export const lists = {
       author: relationship({
         // we could have used 'Author', but then the relationship would only be 1-way
         ref: 'Author.posts',
-
-        // we customise how this will look in the AdminUI, for fun
-        ui: {
-          displayMode: 'cards',
-          cardFields: ['name', 'email'],
-          inlineEdit: { fields: ['name', 'email'] },
-          linkToItem: true,
-          inlineConnect: true,
-        },
-
         many: false, // only 1 author for each Post (the default)
       }),
 
@@ -90,15 +80,12 @@ export const lists = {
         ref: 'Tag.posts',
         many: true, // a Post can have many Tags, not just one
 
-        // we customise how this will look in the AdminUI, for fun
-        ui: {
-          displayMode: 'cards',
-          cardFields: ['name'],
-          inlineEdit: { fields: ['name'] },
-          linkToItem: true,
-          inlineConnect: true,
-          inlineCreate: { fields: ['name'] },
-        },
+        // TODO: restore after breaking change
+//          ui: {
+//            inlineCreate: {
+//              fields: ['name']
+//            }
+//          }
       }),
     },
   }),

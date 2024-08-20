@@ -6,7 +6,6 @@ import { TextArea, TextField } from '@keystar/ui/text-field'
 import { Text } from '@keystar/ui/typography'
 
 import type {
-  CardValueComponent,
   CellComponent,
   FieldController,
   FieldControllerConfig,
@@ -20,7 +19,7 @@ export function Field (props: FieldProps<typeof controller>) {
 
   const [shouldShowErrors, setShouldShowErrors] = useState(false)
   const validationMessages = validate(value, field.validation, field.label)
-  
+
   const isReadOnly = onChange == null
   const isNull = value.inner.kind === 'null'
   const isTextArea = field.displayMode === 'textarea'
@@ -35,11 +34,11 @@ export function Field (props: FieldProps<typeof controller>) {
       isNull={isNull}
       onChange={() => {
         if (!onChange) return
-        
+
         const inner = value.inner.kind === 'value'
           ? { kind: 'null', prev: value.inner.value } as const
           : { kind: 'value', value: value.inner.prev } as const
-        
+
         onChange({ ...value, inner })
       }}
     >
@@ -86,15 +85,6 @@ export const Cell: CellComponent = ({ item, field, linkTo }) => {
   return linkTo ? <CellLink {...linkTo}>{value}</CellLink> : <CellContainer>{value}</CellContainer>
 }
 Cell.supportsLinkTo = true
-
-export const CardValue: CardValueComponent = ({ item, field }) => {
-  return (
-    <VStack elementType="dl" gap="medium">
-      <FieldLabel elementType="dt">{field.label}</FieldLabel>
-      <Text elementType="dd" color="neutralEmphasis">{item[field.path]}</Text>
-    </VStack>
-  )
-}
 
 type Config = FieldControllerConfig<TextFieldMeta>
 

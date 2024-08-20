@@ -4,8 +4,8 @@ import { FieldLabel } from '@keystar/ui/field'
 import { VStack } from '@keystar/ui/layout'
 import { Text } from '@keystar/ui/typography'
 
+import { jsx, useTheme } from '@keystone-ui/core'
 import type {
-  CardValueComponent,
   CellComponent,
   FieldController,
   FieldControllerConfig,
@@ -32,15 +32,6 @@ export const Cell: CellComponent = ({ item, field }) => {
     <Badge tone={value ? 'positive' : 'critical'}>
       <Text>{value ? 'true' : 'false'}</Text>
     </Badge>
-  )
-}
-
-export const CardValue: CardValueComponent = ({ item, field }) => {
-  return (
-    <VStack elementType="dl" gap="medium">
-      <FieldLabel elementType="dt">{field.label}</FieldLabel>
-      <Text elementType="dd" color="neutralEmphasis">{item[field.path] + ''}</Text>
-    </VStack>
   )
 }
 

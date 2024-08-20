@@ -65,8 +65,7 @@ function InternalKeystoneProvider ({
   const { push: navigate } = useRouter()
   const keystarRouter = useMemo(() => ({ navigate }), [navigate])
   const adminMeta = useAdminMeta(adminMetaHash, fieldViews)
-  const { authenticatedItem, visibleLists, createViewFieldModes, refetch } =
-    useLazyMetadata(lazyMetadataQuery)
+  const { authenticatedItem, visibleLists, createViewFieldModes, refetch } = useLazyMetadata(lazyMetadataQuery)
   const reinitContext = async () => {
     await adminMeta?.refetch?.()
     await refetch()
