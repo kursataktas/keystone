@@ -80,8 +80,11 @@ const labelFieldAlias = '____label____'
 
 export const RelationshipSelect = ({
   autoFocus,
+  description,
   isDisabled,
   isLoading,
+  isReadOnly,
+  label,
   labelField,
   searchFields,
   list,
@@ -90,8 +93,11 @@ export const RelationshipSelect = ({
   extraSelection = '',
 }: {
   autoFocus?: boolean
-  isDisabled: boolean
+  description?: string
+  isDisabled?: boolean
   isLoading?: boolean
+  isReadOnly?: boolean
+  label?: string
   labelField: string
   searchFields: string[]
   list: ListMeta
@@ -226,13 +232,17 @@ export const RelationshipSelect = ({
   if (state.kind === 'one') {
     return (
       <Combobox
-        // this is necessary because react-select passes a second argument to onInputChange
-        // and useState setters log a warning if a second argument is passed
-        onInputChange={(val) => setSearch(val)}
-        loadingState={loading || isLoading ? 'loading' : 'idle'}
         autoFocus={autoFocus}
-        selectedKey={state.value ? state.value.id : null}
+        description={description}
+        isDisabled={isDisabled}
+        isReadOnly={isReadOnly}
         items={data?.items ?? []}
+        label={label}
+        loadingState={loading || isLoading ? 'loading' : 'idle'}
+        onInputChange={setSearch}
+        onLoadMore={onLoadMore}
+        placeholder={placeholder}
+        selectedKey={state.value ? state.value.id : null}
         onSelectionChange={(key) => {
           const item = key ? data?.items.find((item) => item[idFieldAlias] === key) : null
           state.onChange(
@@ -245,9 +255,8 @@ export const RelationshipSelect = ({
               : null
           )
         }}
-        onLoadMore={onLoadMore}
-        placeholder={placeholder}
-        isDisabled={isDisabled}
+        minWidth="alias.singleLineWidth"
+        width="auto"
       >
         {(item) => <Item key={item[idFieldAlias]}>{item[labelFieldAlias] || item[idFieldAlias]}</Item>}
       </Combobox>
@@ -256,13 +265,18 @@ export const RelationshipSelect = ({
 
   return (
     <Combobox
-      onInputChange={setSearch}
-      loadingState={loading || isLoading ? 'loading' : 'idle'}
       autoFocus={autoFocus}
+      description={description}
+      isDisabled={isDisabled}
+      isReadOnly={isReadOnly}
       items={data?.items ?? []}
+      label={label}
+      loadingState={loading || isLoading ? 'loading' : 'idle'}
+      onInputChange={setSearch}
       onLoadMore={onLoadMore}
       placeholder={placeholder}
-      isDisabled={isDisabled}
+      minWidth="alias.singleLineWidth"
+      width="auto"
     >
       {(item) => <Item key={item[idFieldAlias]}>{item[labelFieldAlias] || item[idFieldAlias]}</Item>}
     </Combobox>
