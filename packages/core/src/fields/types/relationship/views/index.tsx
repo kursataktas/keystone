@@ -16,12 +16,12 @@ import { Text } from '@keystar/ui/typography'
 import { jsx, Stack, useTheme } from '@keystone-ui/core'
 import { FieldDescription, FieldLegend } from '@keystone-ui/fields'
 import { DrawerController } from '@keystone-ui/modals'
-import {
-  type CellComponent,
-  type FieldController,
-  type FieldControllerConfig,
-  type FieldProps,
-  type ListMeta,
+import type {
+  CellComponent,
+  FieldController,
+  FieldControllerConfig,
+  FieldProps,
+  ListMeta,
 } from '../../../../types'
 import { useList } from '../../../../admin-ui/context'
 import { gql, useQuery } from '../../../../admin-ui/apollo'
@@ -139,7 +139,7 @@ function ContextualActionsMenu (props: FieldProps<typeof controller>) {
   const router = useRouter()
   const foreignList = useList(field.refListKey)
   const relatedItem = useRelatedItem(props)
-  
+
   const items = useMemo(() => {
     let result = []
     let allowCreate = !field.hideCreate && onChange !== undefined
@@ -519,19 +519,20 @@ export function controller (
 
 function useRelationshipFilterValues ({ value, list }: { value: string, list: ListMeta }) {
   const foreignIds = getForeignIds(value)
-  const where = { id: { in: foreignIds } }
-  const query = gql`
+  const { data, loading } = useQuery(gql`
     query FOREIGNLIST_QUERY($where: ${list.graphql.names.whereInputName}!) {
       items: ${list.graphql.names.listQueryName}(where: $where) {
         id
         ${list.labelField}
       }
     }
-  `
-
-  const { data, loading } = useQuery(query, {
+  `, {
     variables: {
-      where,
+      where: {
+        id: {
+          in: foreignIds
+        }
+      }
     },
   })
 

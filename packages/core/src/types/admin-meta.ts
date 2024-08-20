@@ -4,15 +4,8 @@ import type { InitialisedList } from '../lib/core/initialise-lists'
 import type { JSONValue } from './utils'
 
 export type NavigationProps = {
-  authenticatedItem: AuthenticatedItem
   lists: ListMeta[]
 }
-
-export type AuthenticatedItem =
-  | { state: 'unauthenticated' }
-  | { state: 'authenticated', label: string, id: string, listKey: string }
-  | { state: 'loading' }
-  | { state: 'error', error: Error | readonly [GraphQLError, ...GraphQLError[]] }
 
 export type VisibleLists =
   | { state: 'loaded', lists: ReadonlySet<string> }

@@ -2,7 +2,6 @@ import Path from 'node:path'
 import { promisify } from 'node:util'
 import fs from 'node:fs/promises'
 import fse from 'fs-extra'
-import resolve from 'resolve'
 import { type GraphQLSchema } from 'graphql'
 import { type Entry, walk as _walk } from '@nodelib/fs.walk'
 import {
@@ -22,19 +21,6 @@ function serializePathForImport (path: string) {
       .replace(/\.tsx?$/, '')
       .replace(new RegExp(`\\${Path.sep}`, 'g'), '/')
   )
-}
-
-function getDoesAdminConfigExist () {
-  try {
-    const configPath = Path.join(process.cwd(), 'admin', 'config')
-    resolve.sync(configPath, { extensions: ['.ts', '.tsx', '.js'], preserveSymlinks: false })
-    return true
-  } catch (err: any) {
-    if (err.code === 'MODULE_NOT_FOUND') {
-      return false
-    }
-    throw err
-  }
 }
 
 export async function writeAdminFile (file: AdminFileToWrite, projectAdminPath: string) {
@@ -98,9 +84,6 @@ export async function generateAdminUI (
   )
   const uniqueFiles = new Set(savedFiles)
 
-  // Write out the built-in admin UI files. Don't overwrite any user-defined pages.
-  const configFileExists = getDoesAdminConfigExist()
-
   // Add files to pages/ which point to any files which exist in admin/pages
   const adminConfigDir = Path.join(process.cwd(), 'admin')
   const userPagesDir = Path.join(adminConfigDir, 'pages')
@@ -114,7 +97,7 @@ export async function generateAdminUI (
     if (err.code !== 'ENOENT') throw err
   }
 
-  let adminFiles = writeAdminFiles(config, graphQLSchema, adminMeta, configFileExists)
+  let adminFiles = writeAdminFiles(config, adminMeta, graphQLSchema)
   for (const { path } of userPagesEntries) {
     const outputFilename = Path.relative(adminConfigDir, path)
     const importPath = Path.relative(
