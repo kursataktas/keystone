@@ -31,48 +31,56 @@ function CreateItemPage (props: CreateItemPageProps) {
         <LoadingDots label="preparing form" />
       ) : (
         <ColumnLayout>
-          <VStack gap="large" gridArea="main" marginTop="xlarge" minWidth={0}>
-            {createViewFieldModes.state === 'error' && (
-              <GraphQLErrorNotice
-                networkError={
-                  createViewFieldModes.error instanceof Error
-                    ? createViewFieldModes.error
-                    : undefined
-                }
-                errors={
-                  createViewFieldModes.error instanceof Error
-                    ? undefined
-                    : createViewFieldModes.error
-                }
-              />
-            )}
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              const item = await createItem.create()
+              if (item) {
+                router.push(`/${list.path}/${item.id}`)
+              }
+            }}
+            style={{
+              display: 'contents',
+            }}
+          >
+            <VStack gap="large" gridArea="main" marginTop="xlarge" minWidth={0}>
+              {createViewFieldModes.state === 'error' && (
+                <GraphQLErrorNotice
+                  networkError={
+                    createViewFieldModes.error instanceof Error
+                      ? createViewFieldModes.error
+                      : undefined
+                  }
+                  errors={
+                    createViewFieldModes.error instanceof Error
+                      ? undefined
+                      : createViewFieldModes.error
+                  }
+                />
+              )}
 
-            {createItem.error && (
-              <GraphQLErrorNotice
-                networkError={createItem.error?.networkError}
-                errors={createItem.error?.graphQLErrors}
-              />
-            )}
+              {createItem.error && (
+                <GraphQLErrorNotice
+                  networkError={createItem.error?.networkError}
+                  errors={createItem.error?.graphQLErrors}
+                />
+              )}
 
-            <Fields {...createItem.props} />
-          </VStack>
+              <Fields {...createItem.props} />
+            </VStack>
 
-          <BaseToolbar>
-            <Button
-              // TODO: implement when `isPending` supported in "@keystar/ui" button
-              // isLoading={createItem.state === 'loading'}
-              prominence="high"
-              onPress={async () => {
-                const item = await createItem.create()
-                if (item) {
-                  router.push(`/${list.path}/${item.id}`)
-                }
-              }}
-            >
-              Create
-              {/* Create {list.singular.toLocaleLowerCase()} */}
-            </Button>
-          </BaseToolbar>
+            <BaseToolbar>
+              <Button
+                // TODO: implement when `isPending` supported in "@keystar/ui" button
+                // isLoading={createItem.state === 'loading'}
+                prominence="high"
+                type="submit"
+              >
+                Create
+                {/* Create {list.singular.toLocaleLowerCase()} */}
+              </Button>
+            </BaseToolbar>
+          </form>
         </ColumnLayout>
       )}
     </PageContainer>
