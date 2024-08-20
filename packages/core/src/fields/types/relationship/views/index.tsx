@@ -2,11 +2,19 @@
 /** @jsx jsx */
 
 import Link from 'next/link'
-import { Fragment, useState } from 'react'
+import { useRouter } from 'next/router'
+import { type Key, Fragment, useMemo, useState } from 'react'
 
-import { Button } from '@keystone-ui/button'
+import { Icon } from '@keystar/ui/icon'
+import { arrowUpRightIcon } from '@keystar/ui/icon/icons/arrowUpRightIcon'
+import { plusIcon } from '@keystar/ui/icon/icons/plusIcon'
+import { Grid, VStack } from '@keystar/ui/layout'
+import { ListView, Item } from '@keystar/ui/list-view'
+import { ActionMenu } from '@keystar/ui/menu'
+import { Text } from '@keystar/ui/typography'
+
 import { jsx, Stack, useTheme } from '@keystone-ui/core'
-import { FieldContainer, FieldDescription, FieldLabel, FieldLegend } from '@keystone-ui/fields'
+import { FieldDescription, FieldLegend } from '@keystone-ui/fields'
 import { DrawerController } from '@keystone-ui/modals'
 import {
   type CellComponent,
@@ -21,62 +29,8 @@ import { CellContainer, CreateItemDrawer } from '../../../../admin-ui/components
 
 import { RelationshipSelect } from './RelationshipSelect'
 
-function LinkToRelatedItems ({
-  itemId,
-  value,
-  list,
-  refFieldKey,
-}: {
-  itemId: string | null
-  value: FieldProps<typeof controller>['value'] & { kind: 'many' | 'one' }
-  list: ListMeta
-  refFieldKey?: string
-}) {
-  function constructQuery ({
-    refFieldKey,
-    itemId,
-    value,
-  }: {
-    refFieldKey?: string
-    itemId: string | null
-    value: FieldProps<typeof controller>['value'] & { kind: 'many' | 'one' }
-  }) {
-    if (!!refFieldKey && itemId) return `!${refFieldKey}_matches="${itemId}"`
-    if (!Array.isArray(value.value)) throw new TypeError('bad query value')
-
-    const ids = value.value.slice(0, 100).map(({ id }) => id)
-    return `!id_in=${ids.join(',')}"`
-  }
-  const commonProps = {
-    size: 'small',
-    tone: 'active',
-    weight: 'link',
-  } as const
-
-  if (value.kind === 'many') {
-    const query = constructQuery({ refFieldKey, value, itemId })
-    return (
-      <Button {...commonProps} as={Link} href={`/${list.path}?${query}`}>
-        View related {list.plural}
-      </Button>
-    )
-  }
-
-  return (
-    <Button {...commonProps} as={Link} href={`/${list.path}/${value.value?.id}`}>
-      View {list.singular} details
-    </Button>
-  )
-}
-
-export const Field = ({
-  field,
-  value,
-  itemValue,
-  autoFocus,
-  onChange,
-  forceValidation,
-}: FieldProps<typeof controller>) => {
+export function Field (props: FieldProps<typeof controller>) {
+  const { field, value, itemValue, autoFocus, onChange, forceValidation } = props
   const keystone = useKeystone()
   const foreignList = useList(field.refListKey)
   const localList = useList(field.listKey)
@@ -97,18 +51,16 @@ export const Field = ({
     )
   }
 
-  const authenticatedItem = keystone.authenticatedItem
-
   return (
-    <FieldContainer as="fieldset">
-      <FieldLabel as="legend">{field.label}</FieldLabel>
-      <FieldDescription id={`${field.path}-description`}>{field.description}</FieldDescription>
-      <Fragment>
-        <Stack gap="medium">
+    <Fragment>
+      <VStack gap="medium">
+        <Grid gap="regular" alignItems="end" columns="minmax(0, 1fr) auto">
           <RelationshipSelect
-            aria-describedby={field.description === null ? undefined : `${field.path}-description`}
+            key={field.path}
             autoFocus={autoFocus}
-            isDisabled={onChange === undefined}
+            label={field.label}
+            description={field.description || undefined}
+            isReadOnly={onChange === undefined}
             labelField={field.refLabelField}
             searchFields={field.refSearchFields}
             list={foreignList}
@@ -138,87 +90,155 @@ export const Field = ({
                   }
             }
           />
-          <Stack across gap="small">
-            {onChange !== undefined && !field.hideCreate && (
-              <Button
-                size="small"
-                disabled={isDrawerOpen}
-                onClick={() => {
-                  setIsDrawerOpen(true)
-                }}
-              >
-                Create related {foreignList.singular}
-              </Button>
+
+          <ContextualActionsMenu {...props} />
+        </Grid>
+
+        {value.kind === 'many' && (
+          <ListView items={value.value} minHeight="scale.2000" maxHeight="scale.3600">
+            {item => (
+              <Item key={item.id}>
+                {item.label}
+              </Item>
             )}
-            {onChange !== undefined &&
-              authenticatedItem.state === 'authenticated' &&
-              authenticatedItem.listKey === field.refListKey &&
-              (value.kind === 'many'
-                ? value.value.find(x => x.id === authenticatedItem.id) === undefined
-                : value.value?.id !== authenticatedItem.id) && (
-                <Button
-                  size="small"
-                  onClick={() => {
-                    const val = {
-                      label: authenticatedItem.label,
-                      id: authenticatedItem.id,
-                    }
-                    if (value.kind === 'many') {
-                      onChange({
-                        ...value,
-                        value: [...value.value, val],
-                      })
-                    } else {
-                      onChange({
-                        ...value,
-                        value: val,
-                      })
-                    }
-                  }}
-                >
-                  {value.kind === 'many' ? 'Add ' : 'Set as '}
-                  {authenticatedItem.label}
-                </Button>
-              )}
-            {!!(value.kind === 'many'
-              ? value.value.length
-              : value.kind === 'one' && value.value) && (
-              <LinkToRelatedItems
-                itemId={value.id}
-                refFieldKey={field.refFieldKey}
-                list={foreignList}
-                value={value}
-              />
-            )}
-          </Stack>
-        </Stack>
-        {onChange !== undefined && (
-          <DrawerController isOpen={isDrawerOpen}>
-            <CreateItemDrawer
-              listKey={foreignList.key}
-              onClose={() => {
-                setIsDrawerOpen(false)
-              }}
-              onCreate={val => {
-                setIsDrawerOpen(false)
-                if (value.kind === 'many') {
-                  onChange({
-                    ...value,
-                    value: [...value.value, val],
-                  })
-                } else if (value.kind === 'one') {
-                  onChange({
-                    ...value,
-                    value: val,
-                  })
-                }
-              }}
-            />
-          </DrawerController>
+          </ListView>
         )}
-      </Fragment>
-    </FieldContainer>
+      </VStack>
+
+      {onChange !== undefined && (
+        <DrawerController isOpen={isDrawerOpen}>
+          <CreateItemDrawer
+            listKey={foreignList.key}
+            onClose={() => {
+              setIsDrawerOpen(false)
+            }}
+            onCreate={val => {
+              setIsDrawerOpen(false)
+              if (value.kind === 'many') {
+                onChange({
+                  ...value,
+                  value: [...value.value, val],
+                })
+              } else if (value.kind === 'one') {
+                onChange({
+                  ...value,
+                  value: val,
+                })
+              }
+            }}
+          />
+        </DrawerController>
+      )}
+    </Fragment>
   )
+}
+
+function ContextualActionsMenu (props: FieldProps<typeof controller>) {
+  const { field, onChange, value } = props
+
+  const router = useRouter()
+  const foreignList = useList(field.refListKey)
+  const relatedItem = useRelatedItem(props)
+  
+  const items = useMemo(() => {
+    let result = []
+    let allowCreate = !field.hideCreate && onChange !== undefined
+
+    if (allowCreate) {
+      result.push({
+        icon: plusIcon,
+        key: 'add',
+        label: `Add ${foreignList.singular.toLocaleLowerCase()}`,
+      })
+    }
+    if (relatedItem) {
+      result.push({
+        key: 'view',
+        ...relatedItem,
+      })
+    }
+
+    return result
+  }, [value])
+
+  const onAction = (key: Key) => {
+    switch (key) {
+      case 'view': {
+        let item = items.find(i => i.key === 'view')
+        if (item && 'href' in item) {
+          router.push(item.href)
+        }
+        break
+      }
+      case 'add': {
+        alert('TODO: "create" modal')
+        break
+      }
+    }
+  }
+
+  // if there are no items, and the user has no ability to add items, don't
+  // render the menu
+  if (onChange === undefined && items.length === 0) {
+    return null
+  }
+
+  return (
+    <ActionMenu
+      aria-label={`Actions for ${field.label}`}
+      // @ts-expect-error FIXME: support both axes in @keystar/ui/menu
+      direction="bottom end"
+      isDisabled={items.length === 0}
+      items={items}
+      onAction={onAction}
+    >
+      {item => (
+        <Item key={item.key} textValue={item.label}>
+          <Icon src={item.icon} />
+          <Text>{item.label}</Text>
+        </Item>
+      )}
+    </ActionMenu>
+  )
+}
+
+function useRelatedItem ({ field, value }: FieldProps<typeof controller>) {
+  const foreignList = useList(field.refListKey)
+
+  if (value.kind === 'count') {
+    return null
+  }
+  if (value.kind === 'many' && !value.value.length) {
+    return null
+  }
+  if (value.kind === 'one' && !value.value) {
+    return null
+  }
+
+  if (value.kind === 'many') {
+    const query = field.refFieldKey && value.id
+      ? `!${field.refFieldKey}_matches="${value.id}"`
+      :`!id_in="${(value?.value)
+        .slice(0, 100) // where does 100 come from?
+        .map(item => item.id)
+        .join(',')}"`
+
+    return {
+      href: `/${foreignList.path}?${query}`,
+      icon: arrowUpRightIcon,
+      label: `View related ${foreignList.plural.toLocaleLowerCase()}`,
+    }
+  }
+
+  if (value.value?.id) {
+    return {
+      href: `/${foreignList.path}/${value.value?.id}`,
+      icon: arrowUpRightIcon,
+      label: `View ${foreignList.singular.toLocaleLowerCase()}`,
+    }
+  }
+
+  return null
 }
 
 export const Cell: CellComponent<typeof controller> = ({ field, item }) => {
@@ -379,7 +399,7 @@ export function controller (
       }
     },
     filter: {
-      Filter: ({ onChange, value }) => {
+      Filter: ({ typeLabel, onChange, value }) => {
         const foreignList = useList(config.fieldMeta.refListKey)
         const { filterValues, loading } = useRelationshipFilterValues({
           value,
@@ -399,6 +419,7 @@ export function controller (
         return (
           <RelationshipSelect
             list={foreignList}
+            label={typeLabel}
             labelField={refLabelField}
             searchFields={refSearchFields}
             isLoading={loading}
