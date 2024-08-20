@@ -31,7 +31,6 @@ export function useLazyMetadata (query: DocumentNode): {
           adminMeta: {
             lists: {
               key: string
-              isHidden: boolean
               fields: { path: string, createView: { fieldMode: 'edit' | 'hidden' } }[]
             }[]
           }
@@ -84,15 +83,11 @@ function getVisibleLists (
   { data }: QueryResult,
   error?: Error | ServerParseError | ServerError | readonly [GraphQLError, ...GraphQLError[]]
 ): VisibleLists {
-  if (error) {
-    return { state: 'error', error }
-  }
+  if (error) return { state: 'error', error }
   if (data) {
     const lists = new Set<string>()
     data.keystone.adminMeta.lists.forEach((list: any) => {
-      if (!list.isHidden) {
-        lists.add(list.key)
-      }
+      if (!list.hideNavigation) lists.add(list.key)
     })
     return { state: 'loaded', lists }
   }

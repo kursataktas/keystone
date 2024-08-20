@@ -115,13 +115,13 @@ export const RelationshipSelect = ({
     { items: { [idFieldAlias]: string, [labelFieldAlias]: string | null }[], count: number },
     { where: Record<string, any>, take: number, skip: number }
   > = gql`
-    query RelationshipSelect($where: ${list.gqlNames.whereInputName}!, $take: Int!, $skip: Int!) {
-      items: ${list.gqlNames.listQueryName}(where: $where, take: $take, skip: $skip) {
+    query RelationshipSelect($where: ${list.graphql.names.whereInputName}!, $take: Int!, $skip: Int!) {
+      items: ${list.graphql.names.listQueryName}(where: $where, take: $take, skip: $skip) {
         ${idFieldAlias}: id
         ${labelFieldAlias}: ${labelField}
         ${extraSelection}
       }
-      count: ${list.gqlNames.listQueryCountName}(where: $where)
+      count: ${list.graphql.names.listQueryCountName}(where: $where)
     }
   `
 
@@ -139,7 +139,7 @@ export const RelationshipSelect = ({
           typePolicies: {
             Query: {
               fields: {
-                [list.gqlNames.listQueryName]: {
+                [list.graphql.names.listQueryName]: {
                   keyArgs: ['where'],
                   merge: (existing: readonly unknown[], incoming: readonly unknown[], { args }) => {
                     const merged = existing ? existing.slice() : []
@@ -155,7 +155,7 @@ export const RelationshipSelect = ({
           },
         }),
       }),
-    [link, list.gqlNames.listQueryName]
+    [link, list.graphql.names.listQueryName]
   )
 
   const initialItemsToLoad = Math.min(list.pageSize, 10)
@@ -189,8 +189,8 @@ export const RelationshipSelect = ({
         { items: { [idFieldAlias]: string, [labelFieldAlias]: string | null }[] },
         { where: Record<string, any>, take: number, skip: number }
       > = gql`
-            query RelationshipSelectMore($where: ${list.gqlNames.whereInputName}!, $take: Int!, $skip: Int!) {
-              items: ${list.gqlNames.listQueryName}(where: $where, take: $take, skip: $skip) {
+            query RelationshipSelectMore($where: ${list.graphql.names.whereInputName}!, $take: Int!, $skip: Int!) {
+              items: ${list.graphql.names.listQueryName}(where: $where, take: $take, skip: $skip) {
                 ${labelFieldAlias}: ${labelField}
                 ${idFieldAlias}: id
                 ${extraSelection}

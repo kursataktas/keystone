@@ -49,7 +49,7 @@ export function HomePage () {
       }
       ${Object.values(lists)
         .filter(list => !list.isSingleton)
-        .map(list => `${list.key}: ${list.gqlNames.listQueryCountName}`)
+        .map(list => `${list.key}: ${list.graphql.names.listQueryCountName}`)
         .join('\n')}
     }`,
     [lists]

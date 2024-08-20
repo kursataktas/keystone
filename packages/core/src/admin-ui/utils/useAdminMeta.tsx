@@ -71,7 +71,6 @@ export function useAdminMeta (adminMetaHash: string, fieldViews: FieldViews) {
     for (const list of adminMeta.lists) {
       runtimeAdminMeta.lists[list.key] = {
         ...list,
-        gqlNames: list.graphql.names,
         groups: [],
         fields: {},
       }

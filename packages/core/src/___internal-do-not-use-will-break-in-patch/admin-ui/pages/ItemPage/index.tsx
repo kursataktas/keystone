@@ -85,8 +85,8 @@ function ItemForm ({
   const [errorDialogValue, setErrorDialogValue] = useState<Error | null>(null)
 
   const [update, { loading, error, data }] = useMutation(
-    gql`mutation ($data: ${list.gqlNames.updateInputName}!, $id: ID!) {
-      item: ${list.gqlNames.updateMutationName}(where: { id: $id }, data: $data) {
+    gql`mutation ($data: ${list.graphql.names.updateInputName}!, $id: ID!) {
+      item: ${list.graphql.names.updateMutationName}(where: { id: $id }, data: $data) {
         ${selectedFields}
       }
     }`,
@@ -285,7 +285,7 @@ function DeleteButton ({
   const router = useRouter()
   const [deleteItem] = useMutation(
     gql`mutation ($id: ID!) {
-      ${list.gqlNames.deleteMutationName}(where: { id: $id }) {
+      ${list.graphql.names.deleteMutationName}(where: { id: $id }) {
         id
       }
     }`,
@@ -393,7 +393,7 @@ function ItemPage ({ listKey }: ItemPageProps) {
       selectedFields,
       query: gql`
         query ItemPage($id: ID!, $listKey: String!) {
-          item: ${list.gqlNames.itemQueryName}(where: {id: $id}) {
+          item: ${list.graphql.names.itemQueryName}(where: {id: $id}) {
             ${selectedFields}
           }
           keystone {

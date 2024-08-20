@@ -69,10 +69,7 @@ export type ListMetaRootVal = {
   initialSort: { field: string, direction: 'ASC' | 'DESC' } | null
   isSingleton: boolean
 
-  // TODO: probably remove this
-  itemQueryName: string
-  listQueryName: string
-  isHidden: ContextFunction<boolean>
+  hideNavigation: ContextFunction<boolean>
   hideCreate: ContextFunction<boolean>
   hideDelete: ContextFunction<boolean>
 }
@@ -155,13 +152,9 @@ export function createAdminMeta (
           | undefined) ?? null,
       isSingleton: list.isSingleton,
 
-      // TODO: probably remove this
-      itemQueryName: listKey,
-      listQueryName: list.graphql.namePlural, // TODO: remove
-
+      hideNavigation: normalizeMaybeSessionFunction(listConfig.ui?.hideNavigation ?? false),
       hideCreate: normalizeMaybeSessionFunction(listConfig.ui?.hideCreate ?? !list.graphql.isEnabled.create),
       hideDelete: normalizeMaybeSessionFunction(listConfig.ui?.hideDelete ?? !list.graphql.isEnabled.delete),
-      isHidden: normalizeMaybeSessionFunction(listConfig.ui?.isHidden ?? false),
     }
 
     adminMetaRoot.lists.push(adminMetaRoot.listsByKey[listKey])

@@ -500,8 +500,8 @@ function useRelationshipFilterValues ({ value, list }: { value: string, list: Li
   const foreignIds = getForeignIds(value)
   const where = { id: { in: foreignIds } }
   const query = gql`
-    query FOREIGNLIST_QUERY($where: ${list.gqlNames.whereInputName}!) {
-      items: ${list.gqlNames.listQueryName}(where: $where) {
+    query FOREIGNLIST_QUERY($where: ${list.graphql.names.whereInputName}!) {
+      items: ${list.graphql.names.listQueryName}(where: $where) {
         id
         ${list.labelField}
       }

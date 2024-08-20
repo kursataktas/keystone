@@ -13,8 +13,6 @@ export const staticAdminMetaQuery = gql`
         lists {
           __typename
           key
-          itemQueryName
-          listQueryName
           initialSort {
             __typename
             field
@@ -138,10 +136,6 @@ export type StaticAdminMetaQuery = {
           direction: KeystoneAdminUISortDirection
         } | null
         isSingleton: boolean
-
-        // TODO: probably remove this
-        itemQueryName: string
-        listQueryName: string
       }>
     }
   }

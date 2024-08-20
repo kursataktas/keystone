@@ -53,9 +53,7 @@ import { useSelectedFields } from './useSelectedFields'
 import { useSort } from './useSort'
 
 type ListPageProps = { listKey: string }
-
 type SelectedKeys = 'all' | Set<number | string>
-
 type FetchedFieldMeta = {
   path: string
   isOrderable: boolean
@@ -63,7 +61,7 @@ type FetchedFieldMeta = {
   listView: { fieldMode: 'read' | 'hidden' }
 }
 
-let listMetaGraphqlQuery: TypedDocumentNode<
+const listMetaGraphqlQuery: TypedDocumentNode<
   {
     keystone: {
       adminMeta: {
@@ -210,24 +208,21 @@ function ListPage ({ listKey }: ListPageProps) {
       // TODO: FIXME: this is bad
       return gql`
         query (
-          $where: ${list.gqlNames.whereInputName},
+          $where: ${list.graphql.names.whereInputName},
           $take: Int!,
           $skip: Int!,
-          $orderBy: [${list.gqlNames.listOrderName}!]
+          $orderBy: [${list.graphql.names.listOrderName}!]
         ) {
-          items: ${list.gqlNames.listQueryName}(
+          items: ${list.graphql.names.listQueryName}(
             where: $where,
             take: $take,
             skip: $skip,
             orderBy: $orderBy
           ) {
-            ${
-              // TODO: maybe namespace all the fields instead of doing this
-              selectedFields.has('id') ? '' : 'id'
-            }
+            ${selectedFields.has('id') ? '' : 'id'}
             ${selectedGqlFields}
           }
-          count: ${list.gqlNames.listQueryCountName}(where: $where)
+          count: ${list.graphql.names.listQueryCountName}(where: $where)
         }
       `
     }, [list, selectedFields]),
@@ -551,8 +546,8 @@ function DeleteItemsDialog (props: { items: Set<Key>, listKey: string, refetch: 
     useMemo(
       () =>
         gql`
-        mutation($where: [${list.gqlNames.whereUniqueInputName}!]!) {
-          ${list.gqlNames.deleteManyMutationName}(where: $where) {
+        mutation($where: [${list.graphql.names.whereUniqueInputName}!]!) {
+          ${list.graphql.names.deleteManyMutationName}(where: $where) {
             id
             ${list.labelField}
           }
@@ -573,46 +568,45 @@ function DeleteItemsDialog (props: { items: Set<Key>, listKey: string, refetch: 
       Run a reduce to count success and failure as well as
       to generate the success message to be passed to the success toast
      */
-    const { successfulItems, unsuccessfulItems } = data[
-      list.gqlNames.deleteManyMutationName
-    ].reduce(
-      (
-        acc: {
+    const { successfulItems, unsuccessfulItems } = data[list.graphql.names.deleteManyMutationName]
+      .reduce(
+        (
+          acc: {
+            successfulItems: number
+            unsuccessfulItems: number
+            successMessage: string
+          },
+          curr: any
+        ) => {
+          if (curr) {
+            acc.successfulItems++
+            acc.successMessage =
+              acc.successMessage === ''
+                ? (acc.successMessage += curr[list.labelField])
+                : (acc.successMessage += `, ${curr[list.labelField]}`)
+          } else {
+            acc.unsuccessfulItems++
+          }
+          return acc
+        },
+        { successfulItems: 0, unsuccessfulItems: 0, successMessage: '' } as {
           successfulItems: number
           unsuccessfulItems: number
           successMessage: string
-        },
-        curr: any
-      ) => {
-        if (curr) {
-          acc.successfulItems++
-          acc.successMessage =
-            acc.successMessage === ''
-              ? (acc.successMessage += curr[list.labelField])
-              : (acc.successMessage += `, ${curr[list.labelField]}`)
-        } else {
-          acc.unsuccessfulItems++
         }
-        return acc
-      },
-      { successfulItems: 0, unsuccessfulItems: 0, successMessage: '' } as {
-        successfulItems: number
-        unsuccessfulItems: number
-        successMessage: string
-      }
-    )
+      )
 
-    // If there are errors
+    // if there are errors
     if (errors?.length) {
-      // Find out how many items failed to delete.
-      // Reduce error messages down to unique instances, and append to the toast as a message.
+      // find out how many items failed to delete.
+      // reduce error messages down to unique instances, and append to the toast as a message.
       toastQueue.critical(`Unable to delete ${unsuccessfulItems} item${unsuccessfulItems === 1 ? '' : 's'}.`, {
         timeout: 5000,
       })
       // toasts.addToast({
       //   tone: 'negative',
       //   title: `Failed to delete ${unsuccessfulItems} of ${
-      //     data[list.gqlNames.deleteManyMutationName].length
+      //     data[list.graphql.names.deleteManyMutationName].length
       //   } ${list.plural}`,
       //   message: errors
       //     .reduce((acc, error) => {
@@ -632,7 +626,7 @@ function DeleteItemsDialog (props: { items: Set<Key>, listKey: string, refetch: 
       // toasts.addToast({
       //   tone: 'positive',
       //   title: `Deleted ${successfulItems} of ${
-      //     data[list.gqlNames.deleteManyMutationName].length
+      //     data[list.graphql.names.deleteManyMutationName].length
       //   } ${list.plural} successfully`,
       //   message: successMessage,
       // })

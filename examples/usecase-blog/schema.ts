@@ -92,12 +92,16 @@ export const lists = {
 
   // this last list is our Tag list, it only has a name field for now
   Tag: list({
-    // WARNING - for this example, anyone can create, query, update and delete anything
+    // WARNING
+    //   for this starter project, anyone can create, query, update and delete anything
+    //
+    //   if you want to prevent random people on the internet from accessing your data,
+    //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
     access: allowAll,
 
-    // we want to hide this list in the AdminUI
+    // dont show this list in the AdminUI
     ui: {
-      isHidden: true,
+      hideNavigation: true,
     },
 
     fields: {

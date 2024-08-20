@@ -25,8 +25,8 @@ export function useCreateItem (list: ListMeta): CreateItemHookResult {
   const router = useRouter()
 
   const [createItem, { loading, error, data: returnedData }] = useMutation(
-    gql`mutation($data: ${list.gqlNames.createInputName}!) {
-      item: ${list.gqlNames.createMutationName}(data: $data) {
+    gql`mutation($data: ${list.graphql.names.createInputName}!) {
+      item: ${list.graphql.names.createMutationName}(data: $data) {
         id
         label: ${list.labelField}
       }
@@ -110,7 +110,7 @@ export function useCreateItem (list: ListMeta): CreateItemHookResult {
             if (typeof data?.item?.id === 'string') {
               cache.evict({
                 id: 'ROOT_QUERY',
-                fieldName: `${list.gqlNames.itemQueryName}(${JSON.stringify({
+                fieldName: `${list.graphql.names.itemQueryName}(${JSON.stringify({
                   where: { id: data.item.id },
                 })})`,
               })
