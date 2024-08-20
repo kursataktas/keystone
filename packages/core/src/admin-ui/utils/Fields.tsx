@@ -64,14 +64,27 @@ export function Fields ({
   groups = [],
   onChange,
 }: FieldsProps) {
+  // TODO: auto-focusing the first field makes sense for e.g. the create item
+  // view, but may be disorienting in other situations. this needs to be
+  // revisited, and the result should probably be memoized
+  const firstFocusable = Object.keys(fields).find(fieldKey => {
+    const fieldMode = fieldModes === null ? 'edit' : fieldModes[fieldKey]
+    const fieldPosition = fieldPositions === null ? 'form' : fieldPositions[fieldKey]
+    return fieldMode !== 'hidden' && fieldPosition === 'form'
+  })
+
   const renderedFields = Object.fromEntries(
     Object.keys(fields).map((fieldKey, index) => {
       const field = fields[fieldKey]
       const val = value[fieldKey]
       const fieldMode = fieldModes === null ? 'edit' : fieldModes[fieldKey]
       const fieldPosition = fieldPositions === null ? 'form' : fieldPositions[fieldKey]
+
       if (fieldMode === 'hidden') return [fieldKey, null]
       if (fieldPosition !== position) return [fieldKey, null]
+      // TODO: this isn't accessible, it should:
+      // - render an inline alert (`Notice`), or
+      // - invoke a "critical" toast message
       if (val.kind === 'error') {
         return [
           fieldKey,
@@ -80,6 +93,7 @@ export function Fields ({
           </div>,
         ]
       }
+
       return [
         fieldKey,
         <RenderField
@@ -89,7 +103,7 @@ export function Fields ({
           itemValue={value}
           forceValidation={forceValidation && invalidFields.has(fieldKey)}
           onChange={fieldMode === 'edit' ? onChange : undefined}
-          autoFocus={index === 0}
+          autoFocus={fieldKey === firstFocusable}
         />,
       ]
     })
@@ -128,6 +142,7 @@ export function Fields ({
     rendered.push(renderedFields[fieldKey])
   }
 
+  // TODO: improve the empty state
   return (
     <Stack gap="xlarge">
       {rendered.length === 0 ? 'There are no fields that you can read or edit' : rendered}
