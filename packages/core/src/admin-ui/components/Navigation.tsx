@@ -14,9 +14,8 @@ import { Notice } from '@keystar/ui/notice'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
 import { Text } from '@keystar/ui/typography'
 
-import { type NavigationProps, type ListMeta, type AuthenticatedItem } from '../../types'
+import { type NavigationProps, type ListMeta } from '../../types'
 import { useKeystone } from '../context'
-import { SignoutButton } from './SignoutButton'
 
 type NavItemProps = {
   /**
@@ -35,7 +34,7 @@ type NavItemProps = {
   isSelected?: boolean
 }
 
-type NavigationContainerProps = Partial<Pick<NavigationProps, 'authenticatedItem'>> & {
+type NavigationContainerProps = {
   children: ReactNode
 }
 
@@ -69,7 +68,6 @@ export function NavItem (props: NavItemProps) {
   const router = useRouter()
 
   let ariaCurrent: 'page' | boolean | undefined = isSelectedProp
-
   if (!ariaCurrent) {
     if (router.pathname === href) {
       ariaCurrent = 'page'
@@ -89,17 +87,15 @@ export function NavItem (props: NavItemProps) {
 }
 
 /**
- * The main navigation component for Keystone Admin UI. Renders containing
- * markup around navigation items, as well as the different states of
- * the `authenticatedItem` element.
+ * The main navigation component for Keystone Admin UI
 */
-export function NavigationContainer ({ authenticatedItem, children }: NavigationContainerProps) {
+export function NavigationContainer ({ children }: NavigationContainerProps) {
   return (
-    <VStack gap="large" height="100%" paddingY="xlarge">
-      <NavList aria-label="main" flex marginEnd="medium">
+    <VStack gap='large' height='100%' paddingY='xlarge'>
+      <NavList aria-label='main' flex marginEnd='medium'>
         {children}
       </NavList>
-      <Footer authItem={authenticatedItem} />
+      <Footer />
     </VStack>
   )
 }
@@ -110,9 +106,7 @@ export function NavigationContainer ({ authenticatedItem, children }: Navigation
  */
 export function ListNavItems ({ lists = [], include = [] }: ListNavItemsProps) {
   const filteredLists = useMemo(() => {
-    if (include.length === 0) {
-      return lists
-    }
+    if (include.length === 0) return lists
     return lists.filter(list => include.includes(list.key))
   }, [lists, include])
 
@@ -134,13 +128,10 @@ export function Navigation () {
   const {
     adminMeta: { lists },
     adminConfig,
-    authenticatedItem,
     visibleLists,
   } = useKeystone()
 
-  if (visibleLists.state === 'loading') {
-    return null
-  }
+  if (visibleLists.state === 'loading') return null
 
   // This visible lists error is critical, and is likely to result in a server
   // restart. If it happens, show the error and don't render navigation.
@@ -162,18 +153,10 @@ export function Navigation () {
     })
     .filter((x): x is NonNullable<typeof x> => Boolean(x))
 
-  if (adminConfig?.components?.Navigation) {
-    return (
-      <adminConfig.components.Navigation
-        authenticatedItem={authenticatedItem}
-        lists={renderableLists}
-      />
-    )
-  }
-
+  if (adminConfig?.components?.Navigation) return <adminConfig.components.Navigation lists={renderableLists} />
   return (
-    <NavigationContainer authenticatedItem={authenticatedItem}>
-      <NavItem href="/">Dashboard</NavItem>
+    <NavigationContainer>
+      <NavItem href='/'>Dashboard</NavItem>
       <Divider />
       <ListNavItems lists={renderableLists} />
     </NavigationContainer>
@@ -183,55 +166,37 @@ export function Navigation () {
 // Internal components
 // -------------------
 
-function Footer ({ authItem }: { authItem: AuthenticatedItem | undefined }) {
+function Footer () {
   return (
-    <HStack paddingX="large" gap="regular">
-      <AuthItem item={authItem} />
+    <HStack paddingX='large' gap='regular'>
       <DeveloperResources />
     </HStack>
   )
 }
 
-function AuthItem ({ item }: { item: AuthenticatedItem | undefined }) {
-  if (!item || item.state !== 'authenticated') {
-    return null
-  }
-
-  return (
-    <TooltipTrigger>
-      <SignoutButton flex />
-      <Tooltip>
-        <Text>Signed in as <strong>{item.label}</strong></Text>
-      </Tooltip>
-    </TooltipTrigger>
-  )
-}
-
-function DeveloperResources () {
+export function DeveloperResources () {
   const { apiPath } = useKeystone()
 
-  if (process.env.NODE_ENV === 'production') {
-    return null
-  }
-
+  if (process.env.NODE_ENV === 'production') return null
+  if (!apiPath) return null // TODO: FIXME: ?
   return (
     <MenuTrigger>
       <TooltipTrigger>
-        <ActionButton aria-label="Developer resources">
+        <ActionButton aria-label='Developer resources'>
           <Icon src={constructionIcon} />
         </ActionButton>
         <Tooltip>Developer resources</Tooltip>
       </TooltipTrigger>
       <Menu>
-        <Item href={apiPath} textValue="API explorer">
+        <Item href={apiPath} textValue='API explorer'>
           <Icon src={fileJson2Icon} />
           <Text>API explorer</Text>
         </Item>
-        <Item target="_blank" href="https://github.com/keystonejs/keystone" textValue="GitHub repository">
+        <Item target='_blank' href='https://github.com/keystonejs/keystone' textValue='GitHub repository'>
           <Icon src={githubIcon} />
           <Text>GitHub repository</Text>
         </Item>
-        <Item target="_blank" href="https://keystonejs.com" textValue="Documentation">
+        <Item target='_blank' href='https://keystonejs.com' textValue='Documentation'>
           <Icon src={bookTextIcon} />
           <Text>Documentation</Text>
         </Item>

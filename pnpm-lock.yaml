@@ -1881,6 +1881,9 @@ importers:
       '@babel/runtime':
         specifier: ^7.24.7
         version: 7.25.0
+      '@keystar/ui':
+        specifier: ^0.7.6
+        version: 0.7.9(next@14.2.5(@babel/core@7.25.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@keystone-ui/button':
         specifier: workspace:^
         version: link:../../design-system/packages/button

@@ -1,14 +1,24 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
-import { useState, Fragment, type FormEvent, useRef, useEffect } from 'react'
+import {
+  type FormEvent,
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import { jsx, H1, Stack, VisuallyHidden } from '@keystone-ui/core'
 import { Button } from '@keystone-ui/button'
 import { TextInput } from '@keystone-ui/fields'
 import { Notice } from '@keystone-ui/notice'
 
-import { useMutation, gql } from '@keystone-6/core/admin-ui/apollo'
+import {
+  useQuery,
+  useMutation,
+  gql
+} from '@keystone-6/core/admin-ui/apollo'
 import { useRawKeystone, useReinitContext } from '@keystone-6/core/admin-ui/context'
 import { useRouter } from '@keystone-6/core/admin-ui/router'
 import { SigninContainer } from '../components/SigninContainer'
@@ -20,6 +30,13 @@ type SigninPageProps = {
   mutationName: string
   successTypename: string
   failureTypename: string
+}
+
+// TODO: dedupe with components/Navigation.tsx
+type AuthenticatedItem = {
+  label: string
+  id: string
+  listKey: string
 }
 
 export const getSigninPage = (props: SigninPageProps) => () => <SigninPage {...props} />
@@ -60,14 +77,25 @@ export function SigninPage ({
   const router = useRouter()
   const rawKeystone = useRawKeystone()
   const redirect = useRedirect()
+  const { data: whoamiResult } = useQuery<{
+    authenticatedItem: AuthenticatedItem | null
+  }>(gql`
+    query whoami {
+      authenticatedItem {
+        label
+        id
+        listKey
+      }
+    }
+  `)
 
   // if we are signed in, redirect immediately
   useEffect(() => {
     if (submitted) return
-    if (rawKeystone.authenticatedItem.state === 'authenticated') {
+    if (whoamiResult?.authenticatedItem) {
       router.push(redirect)
     }
-  }, [rawKeystone.authenticatedItem, router, redirect, submitted])
+  }, [whoamiResult?.authenticatedItem, router, redirect, submitted])
 
   useEffect(() => {
     if (!submitted) return
