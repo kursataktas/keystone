@@ -121,7 +121,8 @@ function ItemForm ({
   const invalidFields = useInvalidFields(list.fields, state.value)
 
   const [forceValidation, setForceValidation] = useState(false)
-  const onSave = useEventCallback(() => {
+  const onSave = useEventCallback((e) => {
+    e.preventDefault()
     const newForceValidation = invalidFields.size !== 0
     setForceValidation(newForceValidation)
     if (newForceValidation) return
@@ -135,20 +136,20 @@ function ItemForm ({
         // update the item, path being undefined generally indicates a failure in the graphql mutation itself - ie a type error
         const error = errors?.find(x => x.path === undefined || x.path?.length === 1)
         if (error) {
-          toastQueue.critical('Unable to save item.', {
+          toastQueue.critical('Unable to save item', {
             actionLabel: 'Details',
             onAction: () => setErrorDialogValue(new Error(error.message)),
             shouldCloseOnAction: true,
           })
         } else {
           // do we need a toast for this?
-          toastQueue.positive('Saved successfully.', {
+          toastQueue.neutral(`Saved changes to ${list.singular.toLocaleLowerCase()}`, {
             timeout: 5000,
           })
         }
       })
       .catch(err => {
-        toastQueue.critical('Unable to save item.', {
+        toastQueue.critical('Unable to save item', {
           actionLabel: 'Details',
           onAction: () => setErrorDialogValue(err),
           shouldCloseOnAction: true,
@@ -162,72 +163,27 @@ function ItemForm ({
 
   return (
     <Fragment>
-      <VStack gap="large" gridArea="main" marginTop="xlarge" minWidth={0}>
-        <GraphQLErrorNotice
-          networkError={error?.networkError}
-          // we're checking for path.length === 1 because errors with a path larger than 1 will be field level errors
-          // which are handled seperately and do not indicate a failure to update the item
-          errors={error?.graphQLErrors.filter(x => x.path?.length === 1)}
-        />
-        <Fields
-          groups={list.groups}
-          fieldModes={fieldModes}
-          fields={list.fields}
-          forceValidation={forceValidation}
-          invalidFields={invalidFields}
-          position="form"
-          fieldPositions={fieldPositions}
-          onChange={useCallback(
-            value => {
-              setValue(state => ({ item: state.item, value: value(state.value) }))
-            },
-            [setValue]
-          )}
-          value={state.value}
-        />
-      </VStack>
-
-      <StickySidebar>
-        <Grid gap="regular" columns="1fr auto" alignItems="end">
-          <TextField
-            label="Item ID"
-            value={itemId}
-            isReadOnly
-            onFocus={({ target }) => {
-              if (target instanceof HTMLInputElement) {
-                target.select()
-              }
-            }}
+      <form onSubmit={onSave} style={{ display: 'contents' }}>
+        {/*
+          Workaround for react-aria "bug" where pressing enter in a form field
+          moves focus to the submit button.
+          See: https://github.com/adobe/react-spectrum/issues/5940
+        */}
+        <button type="submit" style={{ display: 'none' }} />
+        <VStack gap="large" gridArea="main" marginTop="xlarge" minWidth={0}>
+          <GraphQLErrorNotice
+            networkError={error?.networkError}
+            // we're checking for path.length === 1 because errors with a path larger than 1 will be field level errors
+            // which are handled seperately and do not indicate a failure to update the item
+            errors={error?.graphQLErrors.filter(x => x.path?.length === 1)}
           />
-          <TooltipTrigger>
-            <ActionButton
-              aria-label="copy id"
-              onPress={async () => {
-                try {
-                  await copyToClipboard(item.id)
-                } catch (err: any) {
-                  toastQueue.critical('Unable to copy to clipboard.')
-                  return
-                }
-                toastQueue.positive('Copied to clipboard.', {
-                  timeout: 5000,
-                })
-              }}
-            >
-              <Icon src={clipboardIcon} />
-            </ActionButton>
-            <Tooltip>Copy ID</Tooltip>
-          </TooltipTrigger>
-        </Grid>
-
-        <Box marginTop="xlarge">
           <Fields
             groups={list.groups}
             fieldModes={fieldModes}
             fields={list.fields}
             forceValidation={forceValidation}
             invalidFields={invalidFields}
-            position="sidebar"
+            position="form"
             fieldPositions={fieldPositions}
             onChange={useCallback(
               value => {
@@ -237,31 +193,83 @@ function ItemForm ({
             )}
             value={state.value}
           />
-        </Box>
-      </StickySidebar>
+        </VStack>
 
-      <Toolbar
-        onSave={onSave}
-        hasChangedFields={!!changedFields.size}
-        onReset={useEventCallback(() => {
-          setValue(state => ({
-            item: state.item,
-            value: deserializeValue(list.fields, state.item),
-          }))
-        })}
-        loading={loading}
-        deleteButton={useMemo(
-          () =>
-            showDelete ? (
-              <DeleteButton
-                list={list}
-                itemLabel={(labelFieldValue ?? itemId) as string}
-                itemId={itemId}
-              />
-            ) : undefined,
-          [showDelete, list, labelFieldValue, itemId]
-        )}
-      />
+        <StickySidebar>
+          <Grid gap="regular" columns="1fr auto" alignItems="end">
+            <TextField
+              label="Item ID"
+              value={itemId}
+              isReadOnly
+              onFocus={({ target }) => {
+                if (target instanceof HTMLInputElement) {
+                  target.select()
+                }
+              }}
+            />
+            <TooltipTrigger>
+              <ActionButton
+                aria-label="copy id"
+                onPress={async () => {
+                  try {
+                    await copyToClipboard(item.id)
+                  } catch (err: any) {
+                    toastQueue.critical('Unable to copy to clipboard.')
+                    return
+                  }
+                  toastQueue.positive('Copied to clipboard.', {
+                    timeout: 5000,
+                  })
+                }}
+              >
+                <Icon src={clipboardIcon} />
+              </ActionButton>
+              <Tooltip>Copy ID</Tooltip>
+            </TooltipTrigger>
+          </Grid>
+
+          <Box marginTop="xlarge">
+            <Fields
+              groups={list.groups}
+              fieldModes={fieldModes}
+              fields={list.fields}
+              forceValidation={forceValidation}
+              invalidFields={invalidFields}
+              position="sidebar"
+              fieldPositions={fieldPositions}
+              onChange={useCallback(
+                value => {
+                  setValue(state => ({ item: state.item, value: value(state.value) }))
+                },
+                [setValue]
+              )}
+              value={state.value}
+            />
+          </Box>
+        </StickySidebar>
+
+        <Toolbar
+          hasChangedFields={!!changedFields.size}
+          onReset={useEventCallback(() => {
+            setValue(state => ({
+              item: state.item,
+              value: deserializeValue(list.fields, state.item),
+            }))
+          })}
+          loading={loading}
+          deleteButton={useMemo(
+            () =>
+              showDelete ? (
+                <DeleteButton
+                  list={list}
+                  itemLabel={(labelFieldValue ?? itemId) as string}
+                  itemId={itemId}
+                />
+              ) : undefined,
+            [showDelete, list, labelFieldValue, itemId]
+          )}
+        />
+      </form>
 
       <DialogContainer onDismiss={() => setErrorDialogValue(null)} isDismissable>
         {errorDialogValue && <ErrorDetailsDialog error={errorDialogValue} />}
@@ -517,13 +525,11 @@ function ItemNotFound (props: PropsWithChildren<{}>) {
 const Toolbar = memo(function Toolbar ({
   hasChangedFields,
   loading,
-  onSave,
   onReset,
   deleteButton,
 }: {
   hasChangedFields: boolean
   loading: boolean
-  onSave: () => void
   onReset: () => void
   deleteButton?: ReactElement
 }) {
@@ -533,7 +539,7 @@ const Toolbar = memo(function Toolbar ({
         // TODO: implement when `isPending` supported in "@keystar/ui" button
         // isLoading={loading}
         prominence="high"
-        onPress={onSave}
+        type="submit"
       >
         Save
       </Button>
