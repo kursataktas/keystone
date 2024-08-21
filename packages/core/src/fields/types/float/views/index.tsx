@@ -46,9 +46,7 @@ function validate (value: Value, validation: Validation, label: string) {
   // so we need to try parsing it again here to provide good messages
   if (typeof val === 'string') {
     const number = parseFloat(val)
-    if (isNaN(number)) {
-      return `${label} must be a number`
-    }
+    if (isNaN(number)) return `${label} must be a number`
     return `${label} must be finite`
   }
 

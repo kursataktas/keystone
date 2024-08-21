@@ -69,6 +69,7 @@ export type FieldController<FormState, FilterValue extends JSONValue = never> = 
   }
 }
 
+// TODO: duplicate, reference core/src/lib/create-admin-meta.ts
 export type FieldMeta = {
   path: string
   label: string
@@ -83,9 +84,6 @@ export type FieldMeta = {
     isNonNull: ('read' | 'create' | 'update')[]
   }
   itemView: {
-    /**
-     * `null` indicates that the value is dynamic and must be fetched for any given item
-     */
     fieldMode: 'edit' | 'read' | 'hidden' | null
     fieldPosition: 'form' | 'sidebar' | null
   }

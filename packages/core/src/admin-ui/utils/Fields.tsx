@@ -150,11 +150,16 @@ export function Fields ({
   )
 }
 
-function FieldGroup (props: { label: string, description: string | null, children: ReactNode }) {
+const buttonSize = 24
+
+function FieldGroup (props: {
+  label: string,
+  description: string | null,
+  children: ReactNode
+}) {
   const descriptionId = useId()
   const labelId = useId()
   const theme = useTheme()
-  const buttonSize = 24
   const { useButtonStyles, useButtonTokens, defaults } = useContext(ButtonContext)
   const buttonStyles = useButtonStyles({ tokens: useButtonTokens(defaults) })
   const divider = (
