@@ -78,17 +78,13 @@ export function useAdminMeta (adminMetaHash: string, fieldViews: FieldViews) {
       for (const field of list.fields) {
         for (const exportName of expectedExports) {
           if ((fieldViews[field.viewsIndex] as any)[exportName] === undefined) {
-            throw new Error(
-              `The view for the field at ${list.key}.${field.path} is missing the ${exportName} export`
-            )
+            throw new Error(`The view for the field at ${list.key}.${field.path} is missing the ${exportName} export`)
           }
         }
 
         Object.keys(fieldViews[field.viewsIndex]).forEach(exportName => {
           if (!expectedExports.has(exportName) && exportName !== 'allowedExportsOnCustomViews') {
-            throw new Error(
-              `Unexpected export named ${exportName} from the view from the field at ${list.key}.${field.path}`
-            )
+            throw new Error(`Unexpected export named ${exportName} from the view from the field at ${list.key}.${field.path}`)
           }
         })
 
