@@ -1,11 +1,14 @@
 import isDeepEqual from 'fast-deep-equal'
 import { useRouter } from 'next/router'
-import { type ComponentProps, useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import {
+  type ComponentProps,
+  useCallback, useEffect, useMemo, useRef, useState,
+} from 'react'
 
 import { toastQueue } from '@keystar/ui/toast'
 
 import type { ListMeta } from '../../types'
-import { useMutation, gql, type ApolloError } from '../apollo'
+import { type ApolloError, gql, useMutation } from '../apollo'
 import { useKeystone } from '../context'
 import { usePreventNavigation } from './usePreventNavigation'
 import type { Fields, Value } from '.'
@@ -118,12 +121,16 @@ export function useCreateItem (list: ListMeta): CreateItemHookResult {
           },
         }).then(x => x.data)
       } catch {
+        // TODO: what about `error` returned from the mutation? do we need
+        // to handle that too, should they be combined? does this code path
+        // even happen?
+        toastQueue.critical(`Unable to create ${list.singular.toLocaleLowerCase()}`)
         return undefined
       }
 
       shouldPreventNavigationRef.current = false
 
-      toastQueue.positive(`${list.singular} created.`, {
+      toastQueue.positive(`${list.singular} created`, {
         timeout: 5000,
         actionLabel: 'Add another',
         onAction: () => {
