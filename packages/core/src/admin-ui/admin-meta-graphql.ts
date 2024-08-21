@@ -31,24 +31,24 @@ export const staticAdminMetaQuery = gql`
             label
             description
             fieldMeta
-            isOrderable
-            isFilterable
+            #isOrderable
+            #isFilterable
 
             viewsIndex
             customViewsIndex
 
             search
             isNonNull
-            createView {
-              fieldMode
-            }
+            #createView {
+            #  fieldMode
+            #}
             itemView {
               fieldMode
-              fieldPosition
+            #  fieldPosition
             }
-            listView {
-              fieldMode
-            }
+            #listView {
+            #  fieldMode
+            #}
           }
 
           groups {
@@ -97,9 +97,9 @@ export const staticAdminMetaQuery = gql`
           }
           isSingleton
 
-          hideNavigation
-          hideCreate
-          hideDelete
+          #hideNavigation
+          #hideCreate
+          #hideDelete
         }
       }
     }
