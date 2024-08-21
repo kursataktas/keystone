@@ -8,14 +8,12 @@ export default function ({
   listKey: string
   initFirstItem: NonNullable<AuthConfig<BaseListTypeInfo>['initFirstItem']>
 }) {
-  // -- TEMPLATE START
-  return `import { getInitPage } from '@keystone-6/auth/pages/InitPage'
+  return `import makeSigninPage from '@keystone-6/auth/pages/InitPage'
 
-export default getInitPage(${JSON.stringify({
+export default makeSigninPage(${JSON.stringify({
   listKey,
   fieldPaths: initFirstItem.fields,
   enableWelcome: !initFirstItem.skipKeystoneWelcome,
 })})
 `
-  // -- TEMPLATE END
 }

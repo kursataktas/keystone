@@ -24,7 +24,6 @@ import type { NavigationProps } from '@keystone-6/core/admin-ui/components'
 type AuthenticatedItem = {
   label: string
   id: string
-  listKey: string
 }
 
 function AuthItem ({ item }: { item: AuthenticatedItem | null }) {
@@ -49,15 +48,30 @@ function Footer ({ authItem }: { authItem: AuthenticatedItem | null }) {
   )
 }
 
-export default function Navigation ({ lists }: NavigationProps) {
+export default ({ labelField }: { labelField: string }) => (props: NavigationProps) => <Navigation labelField={labelField} {...props} />
+
+function Navigation ({
+  labelField,
+  lists
+}: {
+  labelField: string
+} & NavigationProps) {
+  console.error('AuthNav', { labelField, query: `
+    query Session {
+      authenticatedItem {
+        id
+        label: ${labelField}
+      }
+    }
+  ` })
+
   const { data } = useQuery<{
     authenticatedItem: AuthenticatedItem | null
   }>(gql`
-    query whoami {
+    query Session {
       authenticatedItem {
-        label
         id
-        listKey
+        label: ${labelField}
       }
     }
   `)

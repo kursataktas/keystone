@@ -24,22 +24,7 @@ import { useRouter } from '@keystone-6/core/admin-ui/router'
 import { SigninContainer } from '../components/SigninContainer'
 import { useRedirect } from '../lib/useFromRedirect'
 
-type SigninPageProps = {
-  identityField: string
-  secretField: string
-  mutationName: string
-  successTypename: string
-  failureTypename: string
-}
-
-// TODO: dedupe with components/Navigation.tsx
-type AuthenticatedItem = {
-  label: string
-  id: string
-  listKey: string
-}
-
-export const getSigninPage = (props: SigninPageProps) => () => <SigninPage {...props} />
+export default (props: Parameters<typeof SigninPage>[0]) => () => <SigninPage {...props} />
 
 export function SigninPage ({
   identityField,
@@ -47,9 +32,15 @@ export function SigninPage ({
   mutationName,
   successTypename,
   failureTypename,
-}: SigninPageProps) {
+}: {
+  identityField: string
+  secretField: string
+  mutationName: string
+  successTypename: string
+  failureTypename: string
+}) {
   const mutation = gql`
-    mutation($identity: String!, $secret: String!) {
+    mutation ($identity: String!, $secret: String!) {
       authenticate: ${mutationName}(${identityField}: $identity, ${secretField}: $secret) {
         ... on ${successTypename} {
           item {
@@ -78,13 +69,11 @@ export function SigninPage ({
   const rawKeystone = useRawKeystone()
   const redirect = useRedirect()
   const { data: whoamiResult } = useQuery<{
-    authenticatedItem: AuthenticatedItem | null
+    authenticatedItem: { id: unknown } | null
   }>(gql`
-    query whoami {
+    query Session {
       authenticatedItem {
-        label
         id
-        listKey
       }
     }
   `)
@@ -92,10 +81,10 @@ export function SigninPage ({
   // if we are signed in, redirect immediately
   useEffect(() => {
     if (submitted) return
-    if (whoamiResult?.authenticatedItem) {
+    if (whoamiResult?.authenticatedItem?.id) {
       router.push(redirect)
     }
-  }, [whoamiResult?.authenticatedItem, router, redirect, submitted])
+  }, [whoamiResult?.authenticatedItem?.id, router, redirect, submitted])
 
   useEffect(() => {
     if (!submitted) return

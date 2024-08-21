@@ -743,7 +743,7 @@ function getListsWithInitialisedFields (
       }
     }
 
-    // Default the labelField to `name`, `label`, or `title` if they exist; otherwise fall back to `id`
+    // default labelField to `name`, `label`, or `title`; fallback to `id`
     const labelField =
       listConfig.ui?.labelField ??
       (listConfig.fields.label

@@ -47,9 +47,7 @@ export function getBaseAuthSchema<I extends string, S extends string> ({
     name: gqlNames.ItemAuthenticationWithPasswordResult,
     types: [ItemAuthenticationWithPasswordSuccess, ItemAuthenticationWithPasswordFailure],
     resolveType (val) {
-      if ('sessionToken' in val) {
-        return gqlNames.ItemAuthenticationWithPasswordSuccess
-      }
+      if ('sessionToken' in val) return gqlNames.ItemAuthenticationWithPasswordSuccess
       return gqlNames.ItemAuthenticationWithPasswordFailure
     },
   })
@@ -57,16 +55,10 @@ export function getBaseAuthSchema<I extends string, S extends string> ({
   const extension = {
     query: {
       authenticatedItem: graphql.field({
-        type: graphql.union({
-          name: 'AuthenticatedItem',
-          types: [base.object(listKey) as graphql.ObjectType<BaseItem>],
-          resolveType: (root, context: KeystoneContext) => context.session?.listKey,
-        }),
+        type: base.object(listKey),
         resolve (root, args, context: KeystoneContext) {
           const { session } = context
-          if (!session) return null
-          if (!session.itemId) return null
-          if (session.listKey !== listKey) return null
+          if (!session?.itemId) return null
 
           return context.db[listKey].findOne({
             where: {
@@ -110,7 +102,6 @@ export function getBaseAuthSchema<I extends string, S extends string> ({
           // Update system state
           const sessionToken = await context.sessionStrategy.start({
             data: {
-              listKey,
               itemId: result.item.id,
             },
             context,

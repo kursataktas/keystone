@@ -26,6 +26,8 @@ import { useRedirect } from '../lib/useFromRedirect'
 
 const signupURL = 'https://signup.keystonejs.cloud/api/newsletter-signup'
 
+export default (props: Parameters<typeof InitPage>[0]) => () => <InitPage {...props} />
+
 function Welcome ({ value, onContinue }: { value: any, onContinue: () => void }) {
   const [subscribe, setSubscribe] = useState(false)
   const [email, setEmail] = useState<string>(guessEmailFromValue(value))
@@ -272,5 +274,3 @@ function InitPage ({
     </SigninContainer>
   )
 }
-
-export const getInitPage = (props: Parameters<typeof InitPage>[0]) => () => <InitPage {...props} />
