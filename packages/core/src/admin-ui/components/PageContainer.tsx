@@ -13,8 +13,8 @@ import { HStack, VStack } from '@keystar/ui/layout'
 
 import { jsx } from '@keystone-ui/core'
 
-import { Navigation } from './Navigation'
 import { Logo } from './Logo'
+import { Navigation } from './Navigation'
 
 type PageContainerProps = {
   children: ReactNode

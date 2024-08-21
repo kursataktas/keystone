@@ -76,10 +76,8 @@ export function NavContainer ({ children }: PropsWithChildren) {
   )
 }
 
-/**
- * @private Exported for internal consumption only.
-*/
-export function InternalNavigation () {
+/** @private Exported for internal consumption only. */
+export function Navigation () {
   const {
     adminMeta: { lists },
     adminConfig,
