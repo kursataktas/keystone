@@ -1,11 +1,8 @@
 import React, { useEffect } from 'react'
 
-import {
-  type ActionButtonProps,
-  ActionButton,
-} from '@keystar/ui/button'
+import { ActionButton } from '@keystar/ui/button'
+import { Divider } from '@keystar/ui/layout'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
-import { HStack } from '@keystar/ui/layout'
 import { Text } from '@keystar/ui/typography'
 
 import {
@@ -14,38 +11,18 @@ import {
   gql,
 } from '@keystone-6/core/admin-ui/apollo'
 import {
-  DeveloperResources,
-  ListNavItems,
-  NavigationContainer,
-  NavItem
+  DeveloperResourcesMenu,
+  NavList,
+  NavContainer,
+  NavFooter,
+  NavItem,
+  getHrefFromList
 } from '@keystone-6/core/admin-ui/components'
 import type { NavigationProps } from '@keystone-6/core/admin-ui/components'
 
 type AuthenticatedItem = {
   label: string
   id: string
-}
-
-function AuthItem ({ item }: { item: AuthenticatedItem | null }) {
-  if (!item) return null
-
-  return (
-    <TooltipTrigger>
-      <SignoutButton flex />
-      <Tooltip>
-        <Text>Signed in as <strong>{item.label}</strong></Text>
-      </Tooltip>
-    </TooltipTrigger>
-  )
-}
-
-function Footer ({ authItem }: { authItem: AuthenticatedItem | null }) {
-  return (
-    <HStack paddingX="large" gap="regular">
-      <AuthItem item={authItem} />
-      <DeveloperResources />
-    </HStack>
-  )
 }
 
 export default ({ labelField }: { labelField: string }) => (props: NavigationProps) => <Navigation labelField={labelField} {...props} />
@@ -56,15 +33,6 @@ function Navigation ({
 }: {
   labelField: string
 } & NavigationProps) {
-  console.error('AuthNav', { labelField, query: `
-    query Session {
-      authenticatedItem {
-        id
-        label: ${labelField}
-      }
-    }
-  ` })
-
   const { data } = useQuery<{
     authenticatedItem: AuthenticatedItem | null
   }>(gql`
@@ -77,11 +45,40 @@ function Navigation ({
   `)
 
   return (
-    <NavigationContainer>
-      <NavItem href='/'>Dashboard</NavItem>
-      <ListNavItems lists={lists} />
-      <Footer authItem={data?.authenticatedItem ?? null} />
-    </NavigationContainer>
+    <NavContainer>
+      <NavList>
+        <NavItem href='/'>Dashboard</NavItem>
+        <Divider />
+        {lists.map((list) => (
+          <NavItem key={list.key} href={getHrefFromList(list)}>
+            {list.label}
+          </NavItem>
+        ))}
+      </NavList>
+
+      <NavFooter>
+        {data?.authenticatedItem && (
+          <SignoutButton authItemLabel={data.authenticatedItem.label} />
+        )}
+        <DeveloperResourcesMenu />
+      </NavFooter>
+    </NavContainer>
+  )
+}
+
+function SignoutButton (props: { authItemLabel: string, children?: React.ReactNode }) {
+  const { authItemLabel, children = 'Sign out' } = props
+  const { signout } = useSignout()
+
+  return (
+    <TooltipTrigger>
+      <ActionButton onPress={() => signout()}>
+        {children}
+      </ActionButton>
+      <Tooltip>
+        <Text>Signed in as <strong>{authItemLabel}</strong></Text>
+      </Tooltip>
+    </TooltipTrigger>
   )
 }
 
@@ -105,15 +102,4 @@ function useSignout () {
     signout,
     loading: result.loading,
   }
-}
-
-function SignoutButton (props: Omit<ActionButtonProps, 'onPress'>) {
-  const { children = 'Sign out', ...otherProps } = props
-  const { signout } = useSignout()
-
-  return (
-    <ActionButton onPress={() => signout()} {...otherProps}>
-      {children}
-    </ActionButton>
-  )
 }

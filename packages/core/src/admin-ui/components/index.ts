@@ -7,11 +7,12 @@ export { ErrorBoundary, ErrorContainer } from './Errors'
 
 export { Logo } from './Logo'
 export {
-  DeveloperResources,
-  ListNavItems,
-  NavGroup,
-  NavigationContainer,
+  getHrefFromList,
+  DeveloperResourcesMenu,
+  NavContainer,
+  NavFooter,
   NavItem,
+  NavList,
 } from './Navigation'
 
 // co-locating the type with the admin-ui/component for a more a salient mental model.

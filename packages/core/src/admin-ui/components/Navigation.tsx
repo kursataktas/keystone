@@ -1,4 +1,4 @@
-import React, { type ReactNode, Fragment, useMemo } from 'react'
+import React, { type ReactNode, type PropsWithChildren } from 'react'
 import { useRouter } from 'next/router'
 
 import { ActionButton } from '@keystar/ui/button'
@@ -8,13 +8,13 @@ import { constructionIcon } from '@keystar/ui/icon/icons/constructionIcon'
 import { githubIcon } from '@keystar/ui/icon/icons/githubIcon'
 import { fileJson2Icon } from '@keystar/ui/icon/icons/fileJson2Icon'
 import { MenuTrigger, Menu, Item } from '@keystar/ui/menu'
-import { Box, HStack, VStack } from '@keystar/ui/layout'
-import { NavList, NavItem as KeystarNavItem } from '@keystar/ui/nav-list'
+import { Box, Divider, HStack, VStack } from '@keystar/ui/layout'
+import { NavList as KeystarNavList, NavItem as KeystarNavItem, NavListProps } from '@keystar/ui/nav-list'
 import { Notice } from '@keystar/ui/notice'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
 import { Text } from '@keystar/ui/typography'
 
-import { type NavigationProps, type ListMeta } from '../../types'
+import { type ListMeta } from '../../types'
 import { useKeystone } from '../context'
 
 type NavItemProps = {
@@ -34,35 +34,11 @@ type NavItemProps = {
   isSelected?: boolean
 }
 
-type NavigationContainerProps = {
-  children: ReactNode
+export function getHrefFromList(list: Pick<ListMeta, 'path' | 'isSingleton'>) {
+  return `/${list.path}${list.isSingleton ? '/1' : ''}`
 }
 
-type ListNavItemsProps = Pick<NavigationProps, 'lists'> & {
-  /**
-   * An array of list keys to include as navigation items. If not provided, all
-   * lists will be included.
-   */
-  include?: string[]
-}
-
-/**
- * Group related navigation items together into categories, under a
- * common title.
- */
-export { NavGroup } from '@keystar/ui/nav-list'
-
-
-/**
- * Dividers can be used to separate navigation items. Prefer `NavGroup` for
- * grouping related items under a common title.
- */
-import { Divider } from '@keystar/ui/layout'
-
-/**
- * A navigation item represents a page in the admin UI. Prefer `ListNavItems`
- * for managing navigation between lists.
-*/
+/** A navigation item represents a page in the AdminUI. */
 export function NavItem (props: NavItemProps) {
   const { children, href, isSelected: isSelectedProp } = props
   const router = useRouter()
@@ -86,45 +62,24 @@ export function NavItem (props: NavItemProps) {
   )
 }
 
-/**
- * The main navigation component for Keystone Admin UI
-*/
-export function NavigationContainer ({ children }: NavigationContainerProps) {
-  return (
-    <VStack gap='large' height='100%' paddingY='xlarge'>
-      <NavList aria-label='main' flex marginEnd='medium'>
-        {children}
-      </NavList>
-      <Footer />
-    </VStack>
-  )
+/** Thin wrapper around "@keystar/ui" component */
+export function NavList (props: NavListProps) {
+  return <KeystarNavList aria-label='main' flex marginEnd='medium' {...props} />
 }
 
-/**
- * Render navigation items for the provided lists. Optionally filter the lists
- * to include only those with specific keys.
- */
-export function ListNavItems ({ lists = [], include = [] }: ListNavItemsProps) {
-  const filteredLists = useMemo(() => {
-    if (include.length === 0) return lists
-    return lists.filter(list => include.includes(list.key))
-  }, [lists, include])
-
+/** The root navigation component for the AdminUI */
+export function NavContainer ({ children }: PropsWithChildren) {
   return (
-    <Fragment>
-      {filteredLists.map((list: ListMeta) => (
-        <NavItem key={list.key} href={`/${list.path}${list.isSingleton ? '/1' : ''}`}>
-          {list.label}
-        </NavItem>
-      ))}
-    </Fragment>
+    <VStack gap='large' height='100%' paddingY='xlarge'>
+      {children}
+    </VStack>
   )
 }
 
 /**
  * @private Exported for internal consumption only.
 */
-export function Navigation () {
+export function InternalNavigation () {
   const {
     adminMeta: { lists },
     adminConfig,
@@ -153,28 +108,40 @@ export function Navigation () {
     })
     .filter((x): x is NonNullable<typeof x> => Boolean(x))
 
-  if (adminConfig?.components?.Navigation) return <adminConfig.components.Navigation lists={renderableLists} />
+  if (adminConfig?.components?.Navigation) {
+    return <adminConfig.components.Navigation lists={renderableLists} />
+  }
+
   return (
-    <NavigationContainer>
-      <NavItem href='/'>Dashboard</NavItem>
-      <Divider />
-      <ListNavItems lists={renderableLists} />
-    </NavigationContainer>
+    <NavContainer>
+      <NavList>
+        <NavItem href='/'>Dashboard</NavItem>
+        <Divider />
+        {renderableLists.map((list: ListMeta) => (
+          <NavItem key={list.key} href={getHrefFromList(list)}>
+            {list.label}
+          </NavItem>
+        ))}
+      </NavList>
+
+      <NavFooter>
+        <DeveloperResourcesMenu />
+      </NavFooter>
+    </NavContainer>
   )
 }
 
-// Internal components
-// -------------------
-
-function Footer () {
+/** Should be displayed below the `NavList` component. */
+export function NavFooter (props: PropsWithChildren) {
   return (
     <HStack paddingX='large' gap='regular'>
-      <DeveloperResources />
+      {props.children}
     </HStack>
   )
 }
 
-export function DeveloperResources () {
+/** A footer item in the navigation. */
+export function DeveloperResourcesMenu () {
   const { apiPath } = useKeystone()
 
   if (process.env.NODE_ENV === 'production') return null
