@@ -18,7 +18,7 @@ import { QueryMode } from '../types'
 import { graphql as graphqlBoundToKeystoneContext } from '../types/schema'
 import {
   type AdminMetaRootVal,
-  type FieldGroupMeta,
+  type FieldGroupMetaRootVal,
   type FieldMetaRootVal,
   type ListMetaRootVal,
 } from './create-admin-meta'
@@ -152,7 +152,7 @@ const KeystoneAdminUIFieldMeta = graphql.object<FieldMetaRootVal>()({
   },
 })
 
-const KeystoneAdminUIFieldGroupMeta = graphql.object<FieldGroupMeta>()({
+const KeystoneAdminUIFieldGroupMeta = graphql.object<FieldGroupMetaRootVal>()({
   name: 'KeystoneAdminUIFieldGroupMeta',
   fields: {
     label: graphql.field({ type: graphql.nonNull(graphql.String) }),

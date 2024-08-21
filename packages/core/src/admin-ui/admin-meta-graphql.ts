@@ -13,20 +13,30 @@ export const staticAdminMetaQuery = gql`
         lists {
           __typename
           key
-          initialSort {
-            __typename
-            field
-            direction
-          }
           path
+          description
+
           label
+          labelField
           singular
           plural
-          description
-          initialColumns
-          pageSize
-          labelField
-          isSingleton
+
+          fields {
+            __typename
+            path
+            label
+            description
+            fieldMeta
+
+            viewsIndex
+            customViewsIndex
+
+            search
+            isNonNull
+            itemView {
+              fieldMode
+            }
+          }
           groups {
             __typename
             label
@@ -63,20 +73,19 @@ export const staticAdminMetaQuery = gql`
               deleteManyMutationName
             }
           }
-          fields {
+
+          pageSize
+          initialColumns
+          initialSort {
             __typename
-            path
-            label
-            description
-            fieldMeta
-            viewsIndex
-            customViewsIndex
-            search
-            isNonNull
-            itemView {
-              fieldMode
-            }
+            field
+            direction
           }
+          isSingleton
+
+          hideNavigation
+          hideCreate
+          hideDelete
         }
       }
     }
@@ -88,7 +97,7 @@ export type StaticAdminMetaQuery = {
     __typename: 'KeystoneMeta'
     adminMeta: {
       __typename: 'KeystoneAdminMeta'
-      lists: Array<{
+      lists: {
         __typename: 'KeystoneAdminUIListMeta'
         key: string
         path: string
@@ -99,7 +108,7 @@ export type StaticAdminMetaQuery = {
         singular: string
         plural: string
 
-        fields: Array<{
+        fields: {
           __typename: 'KeystoneAdminUIFieldMeta'
           path: string
           label: string
@@ -114,8 +123,8 @@ export type StaticAdminMetaQuery = {
             fieldPosition: KeystoneAdminUIFieldMetaItemViewFieldPosition | null
             fieldMode: KeystoneAdminUIFieldMetaItemViewFieldMode | null
           } | null
-        }>
-        groups: Array<{
+        }[]
+        groups: {
           __typename: 'KeystoneAdminUIFieldGroupMeta'
           label: string
           description: string | null
@@ -123,7 +132,7 @@ export type StaticAdminMetaQuery = {
             __typename: 'KeystoneAdminUIFieldMeta'
             path: string
           }>
-        }>
+        }[]
         graphql: {
           names: GraphQLNames
         },
@@ -136,7 +145,11 @@ export type StaticAdminMetaQuery = {
           direction: KeystoneAdminUISortDirection
         } | null
         isSingleton: boolean
-      }>
+
+        hideNavigation: boolean
+        hideCreate: boolean
+        hideDelete: boolean
+      }[]
     }
   }
 }

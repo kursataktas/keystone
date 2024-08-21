@@ -1,7 +1,9 @@
 import type { GraphQLError } from 'graphql'
 import type { ReactElement } from 'react'
-import type { InitialisedList } from '../lib/core/initialise-lists'
-import type { JSONValue } from './utils'
+import type {
+  GraphQLNames,
+  JSONValue
+} from './utils'
 
 export type NavigationProps = {
   lists: ListMeta[]
@@ -50,8 +52,8 @@ export type FieldController<FormState, FilterValue extends JSONValue = never> = 
   description: string | null
   graphqlSelection: string
   defaultValue: FormState
-  deserialize: (item: any) => FormState
-  serialize: (formState: FormState) => any
+  deserialize: (item: any) => FormState // TODO: unknown
+  serialize: (formState: FormState) => any // TODO: unknown
   validate?: (formState: FormState) => boolean
   filter?: {
     types: Record<string, FilterTypeDeclaration<FilterValue>>
@@ -69,23 +71,32 @@ export type FieldController<FormState, FilterValue extends JSONValue = never> = 
   }
 }
 
-// TODO: duplicate, reference core/src/lib/create-admin-meta.ts
 export type FieldMeta = {
   path: string
   label: string
   description: string | null
-  fieldMeta: JSONValue
+  fieldMeta: JSONValue | null
+  isFilterable: boolean
+  isOrderable: boolean
+
   viewsIndex: number
   customViewsIndex: number | null
   views: FieldViews[number]
   controller: FieldController<unknown, JSONValue>
+
   search: 'default' | 'insensitive' | null
   graphql: {
     isNonNull: ('read' | 'create' | 'update')[]
   }
+  createView: {
+    fieldMode: 'edit' | 'hidden' | null
+  }
   itemView: {
     fieldMode: 'edit' | 'read' | 'hidden' | null
     fieldPosition: 'form' | 'sidebar' | null
+  }
+  listView: {
+    fieldMode: 'read' | 'hidden' | null
   }
 }
 
@@ -108,30 +119,38 @@ export type ListMeta = {
   fields: { [path: string]: FieldMeta }
   groups: FieldGroupMeta[]
   graphql: {
-    names: InitialisedList['graphql']['names']
+    names: GraphQLNames
   }
 
   pageSize: number
   initialColumns: string[]
   initialSort: null | { direction: 'ASC' | 'DESC', field: string }
   isSingleton: boolean
+
+  hideNavigation: boolean
+  hideCreate: boolean
+  hideDelete: boolean
 }
 
 export type AdminMeta = {
   lists: { [list: string]: ListMeta }
 }
 
+type Item = {
+  [key: string]: unknown
+}
+
 export type FieldProps<FieldControllerFn extends (...args: any) => FieldController<any, any>> = {
   field: ReturnType<FieldControllerFn>
-  value: ReturnType<ReturnType<FieldControllerFn>['deserialize']>
-  itemValue: unknown
-  onChange?(value: ReturnType<ReturnType<FieldControllerFn>['deserialize']>): void
   autoFocus?: boolean
   /**
    * Will be true when the user has clicked submit and
    * the validate function on the field controller has returned false
    */
   forceValidation?: boolean
+  onChange?(value: ReturnType<ReturnType<FieldControllerFn>['deserialize']>): void
+  value: ReturnType<ReturnType<FieldControllerFn>['deserialize']>
+  itemValue: Item
 }
 
 export type FieldViews = Record<
