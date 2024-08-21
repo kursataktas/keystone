@@ -16,11 +16,11 @@ import {
 } from '../types/utils'
 import { QueryMode } from '../types'
 import { graphql as graphqlBoundToKeystoneContext } from '../types/schema'
-import {
-  type AdminMetaRootVal,
-  type FieldGroupMetaRootVal,
-  type FieldMetaRootVal,
-  type ListMetaRootVal,
+import type {
+  AdminMetaRootVal,
+  FieldGroupMetaRootVal,
+  FieldMetaRootVal,
+  ListMetaRootVal,
 } from './create-admin-meta'
 
 type Context = KeystoneContext | { isAdminUIBuildProcess: true }

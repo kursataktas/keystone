@@ -136,7 +136,7 @@ export type AdminMeta = {
   lists: { [list: string]: ListMeta }
 }
 
-type Item = {
+export type Item = {
   [key: string]: unknown
 }
 

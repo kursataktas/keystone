@@ -4,13 +4,17 @@ import { jsx, Stack, useTheme, Text } from '@keystone-ui/core'
 import { memo, type ReactNode, useContext, useId, useMemo } from 'react'
 import { FieldDescription } from '@keystone-ui/fields'
 import { ButtonContext } from '@keystone-ui/button'
-import { type FieldGroupMeta, type FieldMeta } from '../../types'
+import type {
+  FieldGroupMeta,
+  FieldMeta,
+  Item,
+} from '../../types'
 import { type Value } from '.'
 
 type RenderFieldProps = {
   field: FieldMeta
   value: unknown
-  itemValue: unknown
+  itemValue: Item
   onChange?(value: (value: Value) => Value): void
   autoFocus?: boolean
   forceValidation?: boolean
