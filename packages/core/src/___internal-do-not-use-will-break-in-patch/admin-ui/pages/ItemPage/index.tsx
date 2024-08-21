@@ -16,12 +16,11 @@ import { ActionButton, Button } from '@keystar/ui/button'
 import { Icon } from '@keystar/ui/icon'
 import { fileWarningIcon } from '@keystar/ui/icon/icons/fileWarningIcon'
 import { clipboardIcon } from '@keystar/ui/icon/icons/clipboardIcon'
-import { AlertDialog, Dialog, DialogContainer, DialogTrigger } from '@keystar/ui/dialog'
+import { AlertDialog, DialogContainer, DialogTrigger } from '@keystar/ui/dialog'
 import { Box, Grid, VStack } from '@keystar/ui/layout'
 import { Notice } from '@keystar/ui/notice'
 import { ProgressCircle } from '@keystar/ui/progress'
-import { Content, SlotProvider } from '@keystar/ui/slots'
-import { css, tokenSchema } from '@keystar/ui/style'
+import { SlotProvider } from '@keystar/ui/slots'
 import { TextField } from '@keystar/ui/text-field'
 import { toastQueue } from '@keystar/ui/toast'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
@@ -44,6 +43,7 @@ import { PageContainer } from '../../../../admin-ui/components/PageContainer'
 import { GraphQLErrorNotice } from '../../../../admin-ui/components/GraphQLErrorNotice'
 import { usePreventNavigation } from '../../../../admin-ui/utils/usePreventNavigation'
 import { CreateButtonLink } from '../../../../admin-ui/components/CreateButtonLink'
+import { ErrorDetailsDialog } from '../../../../admin-ui/components/Errors'
 import { BaseToolbar, ColumnLayout, ItemPageHeader, StickySidebar } from './common'
 
 type ItemPageProps = {
@@ -150,9 +150,7 @@ function ItemForm ({
       .catch(err => {
         toastQueue.critical('Unable to save item.', {
           actionLabel: 'Details',
-          onAction: () => {
-            setErrorDialogValue(err)
-          },
+          onAction: () => setErrorDialogValue(err),
           shouldCloseOnAction: true,
         })
       })
@@ -334,41 +332,6 @@ function DeleteButton ({
         {errorDialogValue && <ErrorDetailsDialog error={errorDialogValue} />}
       </DialogContainer>
     </Fragment>
-  )
-}
-
-function ErrorDetailsDialog (props: { error: Error }) {
-  return (
-    <Dialog>
-      <Heading>Error details</Heading>
-      <Content>
-        <VStack gap="large">
-          <Text weight="medium">
-            {props.error.message}
-          </Text>
-          {props.error.stack && (
-            <Box
-              elementType="pre"
-              backgroundColor="critical"
-              borderRadius="regular"
-              maxHeight="100%"
-              padding="medium"
-              overflow="auto"
-            >
-              <Text
-                color="critical"
-                trim={false}
-                UNSAFE_className={css({
-                  fontFamily: tokenSchema.typography.fontFamily.code
-                })}
-              >
-                {props.error.stack}
-              </Text>
-            </Box>
-          )}
-        </VStack>
-      </Content>
-    </Dialog>
   )
 }
 
