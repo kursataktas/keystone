@@ -1,7 +1,11 @@
 import {
   type GraphQLNames,
-  type JSONValue,
 } from '../types/utils'
+import {
+  type ListMeta,
+  type FieldMeta,
+  type FieldGroupMeta,
+} from '../types'
 import { gql } from './apollo'
 
 export const staticAdminMetaQuery = gql`
@@ -27,16 +31,26 @@ export const staticAdminMetaQuery = gql`
             label
             description
             fieldMeta
+            isOrderable
+            isFilterable
 
             viewsIndex
             customViewsIndex
 
             search
             isNonNull
+            createView {
+              fieldMode
+            }
             itemView {
+              fieldMode
+              fieldPosition
+            }
+            listView {
               fieldMode
             }
           }
+
           groups {
             __typename
             label
@@ -92,72 +106,33 @@ export const staticAdminMetaQuery = gql`
   }
 `
 
+// TODO: FIXME: should use DeepNullable
 export type StaticAdminMetaQuery = {
   keystone: {
     __typename: 'KeystoneMeta'
     adminMeta: {
       __typename: 'KeystoneAdminMeta'
-      lists: {
+      lists: (ListMeta & {
         __typename: 'KeystoneAdminUIListMeta'
-        key: string
-        path: string
-        description: string | null
 
-        label: string
-        labelField: string
-        singular: string
-        plural: string
-
-        fields: {
+        fields: (Omit<FieldMeta, 'graphql'> & {
           __typename: 'KeystoneAdminUIFieldMeta'
-          path: string
-          label: string
-          description: string | null
-          fieldMeta: JSONValue | null
-          viewsIndex: number
-          customViewsIndex: number | null
-          search: QueryMode | null
-          isNonNull: ('read' | 'create' | 'update')[]
-          itemView: {
-            __typename: 'KeystoneAdminUIFieldMetaItemView'
-            fieldPosition: KeystoneAdminUIFieldMetaItemViewFieldPosition | null
-            fieldMode: KeystoneAdminUIFieldMetaItemViewFieldMode | null
-          } | null
-        }[]
-        groups: {
+          isNonNull: FieldMeta['graphql']['isNonNull'] // TODO: FIXME: flattened?
+        })[]
+        groups: (FieldGroupMeta & {
           __typename: 'KeystoneAdminUIFieldGroupMeta'
-          label: string
-          description: string | null
-          fields: Array<{
+          fields: (FieldMeta & {
             __typename: 'KeystoneAdminUIFieldMeta'
-            path: string
-          }>
-        }[]
+          })[]
+        })[]
         graphql: {
           names: GraphQLNames
         },
 
-        pageSize: number
-        initialColumns: Array<string>
-        initialSort: {
+        initialSort: ({
           __typename: 'KeystoneAdminUISort'
-          field: string
-          direction: KeystoneAdminUISortDirection
-        } | null
-        isSingleton: boolean
-
-        hideNavigation: boolean
-        hideCreate: boolean
-        hideDelete: boolean
-      }[]
+        } & ListMeta['initialSort'])
+      })[]
     }
   }
 }
-
-type QueryMode = 'default' | 'insensitive'
-
-type KeystoneAdminUIFieldMetaItemViewFieldMode = 'edit' | 'read' | 'hidden'
-
-type KeystoneAdminUIFieldMetaItemViewFieldPosition = 'form' | 'sidebar'
-
-type KeystoneAdminUISortDirection = 'ASC' | 'DESC'

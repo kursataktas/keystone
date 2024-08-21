@@ -26,7 +26,7 @@ type FieldMetaRootVal_ = {
   isOrderable: ContextFunction<boolean>
   isFilterable: ContextFunction<boolean>
 
-  isNonNull: ('read' | 'create' | 'update')[]
+  isNonNull: ('read' | 'create' | 'update')[] // TODO: FIXME: flattened?
   createView: {
     fieldMode: ContextFunction<'edit' | 'hidden'>
   }
@@ -38,6 +38,7 @@ type FieldMetaRootVal_ = {
     fieldMode: ContextFunction<'read' | 'hidden'>
   }
 }
+
 export type FieldMetaRootVal = FieldMetaRootVal_
   & Omit<FieldMeta, keyof FieldMetaRootVal_ | 'controller' | 'graphql' | 'views'>
 

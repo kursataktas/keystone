@@ -108,12 +108,8 @@ export function useAdminMeta (adminMetaHash: string, fieldViews: FieldViews) {
 
         runtimeAdminMeta.lists[list.key].fields[field.path] = {
           ...field,
-          itemView: {
-            fieldMode: field.itemView?.fieldMode ?? null,
-            fieldPosition: field.itemView?.fieldPosition ?? null,
-          },
           graphql: {
-            isNonNull: field.isNonNull,
+            isNonNull: field.isNonNull, // TODO: FIXME: flattened?
           },
           views,
           controller: views.controller({
