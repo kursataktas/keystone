@@ -2,13 +2,17 @@ import {
   type GraphQLNamedType,
   type GraphQLSchema,
   type GraphQLType,
+  getIntrospectionQuery,
   GraphQLEnumType,
   GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLScalarType,
+  graphqlSync,
   introspectionTypes,
 } from 'graphql'
+import {} from 'gql.tada'
+import { preprocessIntrospection } from 'gql.tada/internal'
 import type { InitialisedList } from './core/initialise-lists'
 
 const introspectionTypesSet = new Set(introspectionTypes)
@@ -100,6 +104,15 @@ export function printGeneratedTypes (
 ) {
   prismaClientPath = stringify(prismaClientPath).replace(/'/g, `\\'`)
 
+  const introspectionQuery = getIntrospectionQuery();
+
+  const result = graphqlSync({ schema: graphQLSchema, source: introspectionQuery })
+  if (result.errors?.length) {
+    throw new Error(`Failed to introspect schema: ${result.errors.map(({ message }) => message).join('\n')}`)
+  }
+
+  const introspectionResult = preprocessIntrospection(result.data as any)
+
   return [
     '/* eslint-disable */',
     '',
@@ -189,6 +202,13 @@ export function printGeneratedTypes (
       }
     })(),
     '}',
+    ``,
+    `type Scalars = {`,
+    ...Object.entries(SCALARS).map(([name, type]) => `  ${name}: ${type}`),
+    `}`,
+    ``,
+    `type IntrospectionResult = ${introspectionResult}`,
+    ``,
     `export type Context<Session = any> = import('@keystone-6/core/types').KeystoneContext<TypeInfo<Session>>`,
     `export type Config<Session = any> = import('@keystone-6/core/types').KeystoneConfig<TypeInfo<Session>>`,
     '',
@@ -202,6 +222,8 @@ export function printGeneratedTypes (
     `  }`,
     `  prisma: import('${prismaClientPath}').PrismaClient`,
     `  session: Session`,
+    `  introspection: IntrospectionResult`,
+    `  scalars: Scalars`,
     `}`,
     ``,
     // we need to reference the `TypeInfo` above in another type that is also called `TypeInfo`

@@ -69,5 +69,10 @@
         }
       ]
     }
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "gql.tada": "patches/gql.tada.patch"
+    }
   }
 }

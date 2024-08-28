@@ -33,4 +33,6 @@ export type BaseKeystoneTypeInfo<Session = any> = {
   lists: Record<string, BaseListTypeInfo<Session>>
   prisma: any
   session: any
+  introspection: any
+  scalars: any
 }

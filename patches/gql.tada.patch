@@ -1,0 +1,22 @@
+diff --git a/dist/gql-tada.d.ts b/dist/gql-tada.d.ts
+index 1f816756761ede6f4eae47d321b06a8dec90537e..490c94a2e4266671fb580b0373320d37487eb303 100644
+--- a/dist/gql-tada.d.ts
++++ b/dist/gql-tada.d.ts
+@@ -1501,7 +1501,7 @@ type getFragmentSelectionType<
+     ? getSelection<Definition['selectionSet']['selections'], Type, Introspection, Fragments>
+     : never
+   : never;
+-type getDocumentType<
++export type getDocumentType<
+   Document extends DocumentNodeLike,
+   Introspection extends SchemaLike,
+   Fragments extends {
+@@ -1901,7 +1901,7 @@ interface GraphQLTadaAPI<Schema extends SchemaLike, Config extends AbstractConfi
+     ? TadaPersistedDocumentNode<Result, Variables>
+     : never;
+ }
+-type schemaOfSetup<Setup extends AbstractSetupSchema> = addIntrospectionScalars<
++export type schemaOfSetup<Setup extends AbstractSetupSchema> = addIntrospectionScalars<
+   mapIntrospection<matchOr<IntrospectionLikeInput, Setup['introspection'], never>>,
+   matchOr<ScalarsLike, Setup['scalars'], {}>
+ >;

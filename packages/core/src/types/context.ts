@@ -16,6 +16,7 @@ import {
   type BaseListTypeInfo,
 } from './type-info'
 import { type MaybePromise } from './utils'
+import { getDocumentType, parseDocument, schemaOfSetup } from 'gql.tada'
 
 export type KeystoneContext<TypeInfo extends BaseKeystoneTypeInfo = BaseKeystoneTypeInfo> = {
   req?: IncomingMessage
@@ -62,8 +63,22 @@ type UniqueWhereInput<ListTypeInfo extends BaseListTypeInfo> =
     ? { readonly where: ListTypeInfo['inputs']['uniqueWhere'] }
     : { readonly where?: ListTypeInfo['inputs']['uniqueWhere'] }
 
+    type Output<
+    Selection extends string | undefined,
+    ListTypeInfo extends BaseListTypeInfo,
+  > = Selection extends string
+    ? getDocumentType<
+        parseDocument<`fragment _ on ${ListTypeInfo["key"]} {${Selection}}`>,
+        schemaOfSetup<{
+          introspection: ListTypeInfo["all"]["introspection"];
+          scalars: ListTypeInfo["all"]["scalars"];
+        }>
+      >
+    : { id: string };
+  
+
 type ListAPI <ListTypeInfo extends BaseListTypeInfo> = {
-  findMany(
+  findMany<const Selection extends string | undefined>(
     args?: {
       readonly where?: ListTypeInfo['inputs']['where']
       readonly take?: number
@@ -72,53 +87,53 @@ type ListAPI <ListTypeInfo extends BaseListTypeInfo> = {
         | ListTypeInfo['inputs']['orderBy']
         | readonly ListTypeInfo['inputs']['orderBy'][]
       readonly cursor?: ListTypeInfo['inputs']['uniqueWhere']
-    } & ResolveFields
-  ): Promise<readonly Record<string, any>[]>
-  findOne(
-    args: UniqueWhereInput<ListTypeInfo> & ResolveFields
-  ): Promise<Record<string, any>>
+    } & ResolveFields<Selection>
+  ): Promise<readonly Output<Selection, ListTypeInfo>[]>
+  findOne<const Selection extends string | undefined>(
+    args: UniqueWhereInput<ListTypeInfo> & ResolveFields<Selection>
+  ): Promise<Output<Selection, ListTypeInfo>>
   count(args?: {
     readonly where?: ListTypeInfo['inputs']['where']
   }): Promise<number>
-  updateOne(
+  updateOne<const Selection extends string | undefined>(
     args: UniqueWhereInput<ListTypeInfo> & {
       readonly data: ListTypeInfo['inputs']['update']
-    } & ResolveFields
-  ): Promise<Record<string, any>>
-  updateMany(
+    } & ResolveFields<Selection>
+  ): Promise<Output<Selection, ListTypeInfo>>
+  updateMany<const Selection extends string | undefined>(
     args: {
       readonly data: readonly (UniqueWhereInput<ListTypeInfo> & {
         readonly data: ListTypeInfo['inputs']['update']
       })[]
-    } & ResolveFields
-  ): Promise<Record<string, any>[]>
-  createOne(
-    args: { readonly data: ListTypeInfo['inputs']['create'] } & ResolveFields
-  ): Promise<Record<string, any>>
-  createMany(
+    } & ResolveFields<Selection>
+  ): Promise<Output<Selection, ListTypeInfo>[]>
+  createOne<const Selection extends string | undefined>(
+    args: { readonly data: ListTypeInfo['inputs']['create'] } & ResolveFields<Selection>
+  ): Promise<Output<Selection, ListTypeInfo>>
+  createMany<const Selection extends string | undefined>(
     args: {
       readonly data: readonly ListTypeInfo['inputs']['create'][]
-    } & ResolveFields
-  ): Promise<Record<string, any>[]>
-  deleteOne(
-    args: UniqueWhereInput<ListTypeInfo> & ResolveFields
-  ): Promise<Record<string, any> | null>
-  deleteMany(
+    } & ResolveFields<Selection>
+  ): Promise<Output<Selection, ListTypeInfo>[]>
+  deleteOne<const Selection extends string | undefined>(
+    args: UniqueWhereInput<ListTypeInfo> & ResolveFields<Selection>
+  ): Promise<Output<Selection, ListTypeInfo> | null>
+  deleteMany<const Selection extends string | undefined>(
     args: {
       readonly where: readonly ListTypeInfo['inputs']['uniqueWhere'][]
-    } & ResolveFields
-  ): Promise<Record<string, any>[]>
+    } & ResolveFields<Selection>
+  ): Promise<Output<Selection, ListTypeInfo>[]>
 }
 
 export type KeystoneListsAPI<ListsTypeInfo extends Record<string, BaseListTypeInfo>> = {
   [Key in keyof ListsTypeInfo]: ListAPI<ListsTypeInfo[Key]>
 }
 
-type ResolveFields = {
+type ResolveFields<Selection extends string | undefined> = (Selection extends string ? { readonly query: Selection } : unknown) & {
   /**
    * @default 'id'
    */
-  readonly query?: string
+  readonly query?: Selection
 }
 
 type DbAPI <ListTypeInfo extends BaseListTypeInfo> = {
