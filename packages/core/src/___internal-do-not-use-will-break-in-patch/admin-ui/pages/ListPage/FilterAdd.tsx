@@ -38,7 +38,8 @@ export function FilterAdd (props: {
   }
   const onSubmit = (event: FormEvent) => {
     event.preventDefault()
-    if (state.kind === 'filter-value') {
+    
+    if (state.kind === 'filter-value' && state.filterValue != null) {
       router.push({
         query: {
           ...router.query,
@@ -70,6 +71,7 @@ export function FilterAdd (props: {
                 <Picker
                   width="100%"
                   aria-label="filter type"
+                  isRequired
                   items={Object.keys(filterTypes).map(filterType => ({
                     label: filterTypes[filterType],
                     value: filterType,
@@ -91,6 +93,10 @@ export function FilterAdd (props: {
                   {item => <Item key={item.value}>{item.label}</Item>}
                 </Picker>
 
+                {/*
+                  TODO: support validation, default to field controller's validate function?
+                  validate?: (value: JSONValue) => string | undefined
+                */}
                 <Filter
                   autoFocus
                   context="add"
