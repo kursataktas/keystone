@@ -70,11 +70,11 @@ export function Field (props: FieldProps<typeof controller>) {
   const { autoFocus, field, forceValidation, onChange, value } = props
 
   const [secureTextEntry, setSecureTextEntry] = useState(true)
-  const [isTouched, setTouched] = useState(false)
+  const [touched, setTouched] = useState({ value: false, confirm: false })
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   const isReadOnly = onChange == null
-  const validationMessage = forceValidation || isTouched
+  const validationMessage = forceValidation || (touched.value && touched.confirm)
     ? validate(value, field.validation, field.label)
     : undefined
 
@@ -85,7 +85,7 @@ export function Field (props: FieldProps<typeof controller>) {
   // reset when the user cancels, or when the form is submitted
   useEffect(() => {
     if (value.kind === 'initial') {
-      setTouched(false)
+      setTouched({ value: false, confirm: false })
       setSecureTextEntry(true)
     }
   }, [value.kind])
@@ -133,7 +133,7 @@ export function Field (props: FieldProps<typeof controller>) {
             aria-describedby={[descriptionId, messageId].filter(Boolean).join(' ')}
             // @ts-expect-error — needs to be fixed in "@keystar/ui"
             isInvalid={!!validationMessage}
-            onBlur={() => setTouched(true)}
+            onBlur={() => setTouched({ ...touched, value: true })}
             onChange={text => onChange({ ...value, value: text })}
             placeholder="New"
             type={secureTextEntry ? 'password' : 'text'}
@@ -145,7 +145,7 @@ export function Field (props: FieldProps<typeof controller>) {
             aria-describedby={messageId} // don't repeat the description announcement for the confirm field
             // @ts-expect-error — needs to be fixed in "@keystar/ui"
             isInvalid={!!validationMessage}
-            onBlur={() => setTouched(true)}
+            onBlur={() => setTouched({ ...touched, confirm: true })}
             onChange={text => onChange({ ...value, confirm: text })}
             placeholder="Confirm"
             type={secureTextEntry ? 'password' : 'text'}
