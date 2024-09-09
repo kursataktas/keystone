@@ -163,7 +163,6 @@ export function Field (props: FieldProps<typeof controller>) {
               <Text isHidden={{ above: 'mobile' }}>Show</Text>
             </ToggleButton>
             <ActionButton
-              alignSelf="start"
               onPress={() => {
                 onChange({ kind: 'initial', isSet: value.isSet })
                 setTimeout(() => {
