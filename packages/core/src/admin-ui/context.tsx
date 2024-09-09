@@ -76,6 +76,15 @@ function InternalKeystoneProvider ({
       body: {
         fontFamily: tokenSchema.typography.fontFamily.base
       },
+
+      // [1] reset all box sizing to border-box
+      // [2] default borders so you can add a border by specifying just the width
+      '*, ::before, ::after': {
+        // boxSizing: 'border-box', // this breaks some things in keystar-ui…
+        borderWidth: 0,
+        borderStyle: 'solid',
+        borderColor: tokenSchema.color.border.neutral,
+      },
     })
   }, [])
 
