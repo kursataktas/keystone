@@ -1,8 +1,10 @@
-import React, { useEffect, useId, useRef, useState } from 'react'
 // @ts-expect-error
 import dumbPasswords from 'dumb-passwords'
+import React, { useEffect, useId, useRef, useState } from 'react'
+import { useSlotId } from '@react-aria/utils'
 
 import { ActionButton, ToggleButton } from '@keystar/ui/button'
+import { Checkbox } from '@keystar/ui/checkbox'
 import { FieldLabel, FieldMessage } from '@keystar/ui/field'
 import { Icon } from '@keystar/ui/icon'
 import { eyeIcon } from '@keystar/ui/icon/icons/eyeIcon';
@@ -17,8 +19,6 @@ import {
   type FieldProps,
 } from '../../../../types'
 import { CellContainer } from '../../../../admin-ui/components'
-import { useSlotId } from '@react-aria/utils'
-import { Checkbox } from '@keystar/ui/checkbox'
 
 function validate (value: Value, validation: Validation, fieldLabel: string): string | undefined {
   if (value.kind === 'initial' && (value.isSet === null || value.isSet === true)) {
