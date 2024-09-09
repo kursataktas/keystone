@@ -35,19 +35,30 @@ function FilterTag ({ filter, field }: { filter: Filter, field: FieldMeta }) {
     const { [`!${filter.field}_${filter.type}`]: _ignore, ...queryToKeep } = router.query
     router.push({ pathname: router.pathname, query: queryToKeep })
   }
+  const tagElement = (
+    <Tag onRemove={onRemove}>
+      <Text>
+        <span>{field.label} </span>
+        <Label
+          label={field.controller.filter!.types[filter.type].label}
+          type={filter.type}
+          value={filter.value}
+        />
+      </Text>
+    </Tag>
+  )
+
+  // TODO: Special "empty" types need to be documented somewhere. Filters that
+  // have no editable value, basically `null` or `!null`. Which offers:
+  // * better DX — we can avoid weird nullable types and UIs that don't make sense
+  // * better UX — users don't have to jump through mental hoops, like "is not exactly" + submit empty field
+  if (filter.type === 'empty' || filter.type === 'not_empty') {
+    return tagElement
+  }
 
   return (
     <DialogTrigger type="popover" mobileType="tray">
-      <Tag onRemove={onRemove}>
-        <Text>
-          <strong>{field.label}</strong>{' '}
-          <Label
-            label={field.controller.filter!.types[filter.type].label}
-            type={filter.type}
-            value={filter.value}
-          />
-        </Text>
-      </Tag>
+      {tagElement}
       {onDismiss => (
         <FilterDialog
           onDismiss={onDismiss}

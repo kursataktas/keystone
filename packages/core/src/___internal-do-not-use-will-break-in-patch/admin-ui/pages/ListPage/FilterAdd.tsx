@@ -25,11 +25,13 @@ export function FilterAdd (props: {
 }) {
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const [state, setState] = useState<State>({ kind: 'selecting-field' })
+  const [forceValidation, setForceValidation] = useState(false)
   const router = useRouter()
 
   const { fieldsWithFilters, filtersByFieldThenType, list } = useFilterFields(props)
   const resetState = () => {
     setState({ kind: 'selecting-field' })
+    setForceValidation(false)
     // This is a bit of a hack to ensure the trigger button is focused after the
     // dialog closes, since we're forking the render
     setTimeout(() => {
@@ -38,16 +40,22 @@ export function FilterAdd (props: {
   }
   const onSubmit = (event: FormEvent) => {
     event.preventDefault()
-    
-    if (state.kind === 'filter-value' && state.filterValue != null) {
-      router.push({
-        query: {
-          ...router.query,
-          [`!${state.fieldPath}_${state.filterType}`]: JSON.stringify(state.filterValue),
-        },
-      })
-      resetState()
+    setForceValidation(true)
+
+    if (state.kind !== 'filter-value') {
+      return
     }
+    if ((state.filterType !== 'empty' && state.filterType !== 'not_empty') && state.filterValue == null) {
+      return
+    }
+
+    router.push({
+      query: {
+        ...router.query,
+        [`!${state.fieldPath}_${state.filterType}`]: JSON.stringify(state.filterValue),
+      },
+    })
+    resetState()
   }
 
   if (state.kind === 'filter-value') {
@@ -63,6 +71,12 @@ export function FilterAdd (props: {
         </ActionButton>
         <Dialog>
           <form onSubmit={onSubmit} style={{ display: 'contents' }}>
+            {/*
+              Workaround for react-aria "bug" where pressing enter in a form field
+              moves focus to the submit button.
+              See: https://github.com/adobe/react-spectrum/issues/5940
+            */}
+            <button type="submit" style={{ display: 'none' }} />
             <Heading>
               Filter by {fieldLabel.toLocaleLowerCase()}
             </Heading>
@@ -100,6 +114,7 @@ export function FilterAdd (props: {
                 <Filter
                   autoFocus
                   context="add"
+                  forceValidation={forceValidation}
                   typeLabel={typeLabel}
                   type={state.filterType}
                   value={state.filterValue}

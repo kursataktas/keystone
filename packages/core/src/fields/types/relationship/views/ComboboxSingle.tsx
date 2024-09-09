@@ -55,12 +55,6 @@ export const ComboboxSingle = ({
   if (error) {
     return <span>Error</span>
   }
-  
-  console.log(`ComboboxSingle ${label}:`, state.value)
-  
-  // if (!data?.items.length) {
-  //   return <span>Loading…</span>
-  // }
 
   return (
     <Combobox

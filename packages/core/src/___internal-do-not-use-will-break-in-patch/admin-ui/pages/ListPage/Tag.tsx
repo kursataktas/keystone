@@ -33,7 +33,6 @@ export function Tag (props: TagProps) {
       }}
       UNSAFE_className={css({
         borderRadius: tokenSchema.size.radius.full,
-        fontWeight: tokenSchema.typography.fontWeight.regular,
         height: tokenSchema.size.element.small,
         paddingInlineStart: tokenSchema.size.space.small,
         paddingInlineEnd: 0,

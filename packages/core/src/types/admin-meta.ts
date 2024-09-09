@@ -61,6 +61,7 @@ export type FieldController<FormState, FilterValue extends JSONValue = never> = 
     Label(type: FilterTypeToFormat<FilterValue>): string | ReactElement | null
     Filter(props: {
       autoFocus?: boolean
+      forceValidation?: boolean
       context: 'add' | 'edit'
       onChange(value: FilterValue): void
       type: string

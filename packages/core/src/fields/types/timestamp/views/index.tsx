@@ -141,32 +141,9 @@ export type TimestampFieldMeta = {
   isRequired: boolean
 }
 
-const FILTER_TYPES = {
-  is: {
-    key: 'equals',
-    label: 'Is exactly',
-    initialValue: null,
-  },
-  not: {
-    key: 'not',
-    label: 'Is not exactly',
-    initialValue: null,
-  },
-  before: {
-    key: 'lt',
-    label: 'Is before',
-    initialValue: null,
-  },
-  after: {
-    key: 'gt',
-    label: 'Is after',
-    initialValue: null,
-  },
-} as const
-
 export const controller = (
   config: FieldControllerConfig<TimestampFieldMeta>
-): FieldController<Value, string> & { fieldMeta: TimestampFieldMeta } => {
+): FieldController<Value, string | null> & { fieldMeta: TimestampFieldMeta } => {
   return {
     path: config.path,
     label: config.label,
@@ -197,9 +174,13 @@ export const controller = (
     validate: value => validate(value, config.fieldMeta, config.label) === undefined,
     filter: {
       Filter (props) {
-        const { autoFocus, context, typeLabel, onChange, value, type, ...otherProps } = props
-
+        const { autoFocus, context, forceValidation, typeLabel, onChange, value, type, ...otherProps } = props
         const [isDirty, setDirty] = useState(false)
+
+        if (type === 'empty' || type === 'not_empty') {
+          return null;
+        }
+
         const parsedValue = value ? parseAbsoluteToLocal(value) : null
 
         return (
@@ -207,8 +188,8 @@ export const controller = (
             label={typeLabel}
             granularity="second"
             placeholderValue={now(getLocalTimeZone())}
-            errorMessage={isDirty && !value ? 'Required' : null}
-            // isRequired
+            errorMessage={(forceValidation || isDirty) && !value ? 'Required' : null}
+            isRequired
             hideTimeZone
             onBlur={() => setDirty(true)}
             onChange={datetime => {
@@ -220,24 +201,56 @@ export const controller = (
         )
       },
       graphql: ({ type, value }) => {
-        let key = FILTER_TYPES[type as keyof typeof FILTER_TYPES].key
+        if (type === 'empty') {
+          return { [config.path]: { equals: null } }
+        }
+        if (type === 'not_empty') {
+          return { [config.path]: { not: { equals: null } } }
+        }
         if (type === 'not') {
-          value = { equals: value }
+          return { [config.path]: { not: { equals: value } } }
         }
-        return {
-          [config.path]: {
-            [key]: value
-          },
-        }
-      },
-      Label ({ type, value }) {
-        const dateFormatter = useDateFormatter({ dateStyle: 'short', timeStyle: 'short' })
-        const parsedValue = parseAbsoluteToLocal(value)
-        const qualifier = FILTER_TYPES[type as keyof typeof FILTER_TYPES].label.toLocaleLowerCase()
 
-        return `${qualifier} ${ dateFormatter.format(parsedValue.toDate())}`
+        return {
+          [config.path]: { [type]: value }
+        }
       },
-      types: FILTER_TYPES,
+      Label ({ label, type, value }) {
+        const dateFormatter = useDateFormatter({ dateStyle: 'short', timeStyle: 'short' })
+        if (type === 'empty' || type === 'not_empty' || value == null) {
+          return label.toLocaleLowerCase()
+        }
+
+        const parsedValue = parseAbsoluteToLocal(value)
+
+        return `${label.toLocaleLowerCase()} ${dateFormatter.format(parsedValue.toDate())}`
+      },
+      types: {
+        equals: {
+          label: 'Is exactly',
+          initialValue: null,
+        },
+        not: {
+          label: 'Is not exactly',
+          initialValue: null,
+        },
+        lt: {
+          label: 'Is before',
+          initialValue: null,
+        },
+        gt: {
+          label: 'Is after',
+          initialValue: null,
+        },
+        empty: {
+          label: 'Is empty',
+          initialValue: null,
+        },
+        not_empty: {
+          label: 'Is not empty',
+          initialValue: null,
+        },
+      },
     },
   }
 }
