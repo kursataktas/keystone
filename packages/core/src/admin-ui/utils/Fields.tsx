@@ -1,8 +1,12 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx, Stack, useTheme, Text } from '@keystone-ui/core'
+
+import { useSlotId } from '@react-aria/utils'
+
+import { Text } from '@keystar/ui/typography'
+
+import { jsx, Stack, useTheme } from '@keystone-ui/core'
 import { memo, type ReactNode, useContext, useId, useMemo } from 'react'
-import { FieldDescription } from '@keystone-ui/fields'
 import { ButtonContext } from '@keystone-ui/button'
 import type {
   FieldGroupMeta,
@@ -161,8 +165,8 @@ function FieldGroup (props: {
   description: string | null,
   children: ReactNode
 }) {
-  const descriptionId = useId()
   const labelId = useId()
+  const descriptionId = useSlotId([Boolean(props.description)]);
   const theme = useTheme()
   const { useButtonStyles, useButtonTokens, defaults } = useContext(ButtonContext)
   const buttonStyles = useButtonStyles({ tokens: useButtonTokens(defaults) })
@@ -179,7 +183,7 @@ function FieldGroup (props: {
     <div
       role="group"
       aria-labelledby={labelId}
-      aria-describedby={props.description === null ? undefined : descriptionId}
+      aria-describedby={descriptionId}
     >
       <details open>
         <summary
@@ -201,7 +205,13 @@ function FieldGroup (props: {
               {downChevron}
             </div>
             {divider}
-            <Text id={labelId} size="large" weight="bold" css={{ position: 'relative' }}>
+            <Text
+              color="neutralEmphasis"
+              size="medium"
+              weight="semibold"
+              id={labelId}
+              position="relative"
+            >
               {props.label}
             </Text>
           </Stack>
@@ -214,8 +224,10 @@ function FieldGroup (props: {
             </Stack>
           </div>
           <Stack marginLeft="medium" css={{ width: '100%' }}>
-            {props.description !== null && (
-              <FieldDescription id={descriptionId}>{props.description}</FieldDescription>
+            {!!props.description && (
+              <Text id={descriptionId} size="regular" color="neutralSecondary">
+                {props.description}
+              </Text>
             )}
             <Stack marginTop="large" gap="xlarge">
               {props.children}
