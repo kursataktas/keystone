@@ -1,13 +1,15 @@
 import { createUploadLink } from 'apollo-upload-client'
 import NextHead from 'next/head'
 import { useRouter } from 'next/router'
-import React, { type ReactNode, createContext, useContext, useMemo } from 'react'
+import React, { type ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
 
 import {
   ClientSideOnlyDocumentElement,
   KeystarProvider,
 } from '@keystar/ui/core'
+import { injectGlobal, tokenSchema } from '@keystar/ui/style'
 import { Toaster } from '@keystar/ui/toast'
+
 import { Center } from '@keystone-ui/core'
 import { LoadingDots } from '@keystone-ui/loading'
 import { DrawerProvider } from '@keystone-ui/modals'
@@ -67,6 +69,15 @@ function InternalKeystoneProvider ({
     await adminMeta?.refetch?.()
     await refetch()
   }
+
+  // TODO: remove this once studio is fully migrated to keystar-ui
+  useEffect(() => {
+    injectGlobal({
+      body: {
+        fontFamily: tokenSchema.typography.fontFamily.base
+      },
+    })
+  }, [])
 
   if (adminMeta.state === 'loading') {
     return (
