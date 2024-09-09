@@ -142,8 +142,8 @@ function ItemForm ({
             shouldCloseOnAction: true,
           })
         } else {
-          // do we need a toast for this?
-          toastQueue.neutral(`Saved changes to ${list.singular.toLocaleLowerCase()}`, {
+          // do we really need a toast for this? the item _should_ save…
+          toastQueue.positive(`Saved changes to ${list.singular.toLocaleLowerCase()}`, {
             timeout: 5000,
           })
         }
@@ -536,8 +536,7 @@ const Toolbar = memo(function Toolbar ({
   return (
     <BaseToolbar>
       <Button
-        // TODO: implement when `isPending` supported in "@keystar/ui" button
-        // isLoading={loading}
+        isPending={loading}
         prominence="high"
         type="submit"
       >

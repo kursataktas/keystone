@@ -4,6 +4,7 @@ import { Checkbox } from '@keystar/ui/checkbox'
 import { Icon } from '@keystar/ui/icon'
 import { cornerDownRightIcon } from '@keystar/ui/icon/icons/cornerDownRightIcon'
 import { HStack, VStack } from '@keystar/ui/layout'
+import { tokenSchema } from '@keystar/ui/style'
 import { Text } from '@keystar/ui/typography'
 
 import { InlineCode } from './InlineCode'
@@ -52,10 +53,14 @@ export function NullableFieldWrapper (props: NullableFieldWrapperProps) {
       <HStack gap="regular" paddingStart="regular">
         <Icon src={cornerDownRightIcon} color="neutralTertiary" />
         <Checkbox
+          prominence="low"
           autoFocus={isNull && autoFocus}
           isReadOnly={isReadOnly}
           isSelected={isNull}
           onChange={onChange}
+          UNSAFE_style={{
+            marginTop: `calc(${tokenSchema.size.icon.small} / -2)`,
+          }}
         >
           <Text>Set to <InlineCode>null</InlineCode></Text>
         </Checkbox>

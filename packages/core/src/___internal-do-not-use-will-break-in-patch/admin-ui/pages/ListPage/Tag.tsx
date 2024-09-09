@@ -63,6 +63,7 @@ export function Tag (props: TagProps) {
           })}
           onClick={e => {
             e.preventDefault()
+            e.stopPropagation()
             onRemove()
           }}
         >

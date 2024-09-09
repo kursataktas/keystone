@@ -273,8 +273,18 @@ export const RelationshipSelect = ({
       label={label}
       loadingState={loading || isLoading ? 'loading' : 'idle'}
       onInputChange={setSearch}
+      inputValue={search}
       onLoadMore={onLoadMore}
       placeholder={placeholder}
+      disabledKeys={state.value.map((item) => item.id)}
+      selectedKey={undefined}
+      onSelectionChange={(key) => {
+        const item = key ? data?.items.find((item) => item[idFieldAlias] === key) : null
+        if (item) {
+          state.onChange([...state.value, { label: item[labelFieldAlias] || item[idFieldAlias], id: item[idFieldAlias], data: item }])
+        }
+        setSearch('')
+      }}
       minWidth="alias.singleLineWidth"
       width="auto"
     >

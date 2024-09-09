@@ -77,8 +77,7 @@ function CreateItemPage (props: CreateItemPageProps) {
 
             <BaseToolbar>
               <Button
-                // TODO: implement when `isPending` supported in "@keystar/ui" button
-                // isLoading={createItem.state === 'loading'}
+                isPending={createItem.state === 'loading'}
                 prominence="high"
                 type="submit"
               >

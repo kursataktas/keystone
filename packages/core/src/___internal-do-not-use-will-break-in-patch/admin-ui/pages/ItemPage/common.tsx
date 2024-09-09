@@ -60,7 +60,7 @@ export function ColumnLayout (props: HTMLAttributes<HTMLDivElement>) {
           gridTemplateAreas: '"main" "sidebar" "toolbar"',
 
           [breakpointQueries.above.tablet]: {
-            gridTemplateColumns: `2fr minmax(${tokenSchema.size.alias.singleLineWidth}, 1fr)`,
+            gridTemplateColumns: `2fr minmax(${tokenSchema.size.scale[3600]}, 1fr)`,
             gridTemplateAreas: '"main sidebar" "toolbar ."',
           },
         })}

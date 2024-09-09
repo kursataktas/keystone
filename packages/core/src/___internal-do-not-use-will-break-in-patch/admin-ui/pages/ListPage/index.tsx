@@ -436,7 +436,7 @@ function ListTable ({
                     // const field = list.fields[key]
                     return (
                       <Cell>
-                        {row[key]?.toString()}
+                        <Text>{row[key]?.toString()}</Text>
                         {/* <CellValue
                           field={field.controller}
                           item={itemForField}
