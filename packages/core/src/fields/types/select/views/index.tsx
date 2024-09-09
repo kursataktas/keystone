@@ -212,7 +212,6 @@ export const controller = (
     label: x.label,
     value: x.value.toString(),
   }))
-  console.log(config.fieldMeta)
 
   // Transform from string value to type appropriate value
   const t = (v: string | null) =>
