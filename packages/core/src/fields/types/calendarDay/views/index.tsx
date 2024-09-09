@@ -28,7 +28,7 @@ export const Field = (props: FieldProps<typeof controller>) => {
 
   const [isDirty, setDirty] = useState(false)
   const [isReadonlyUTC, toggleReadonlyUTC] = useReducer((prev) => !prev, false)
-  const dateFormatter = useDateFormatter({ dateStyle: 'long', timeStyle: 'long' })
+  const dateFormatter = useDateFormatter({ dateStyle: 'long' })
   const placeholderValue = useMemo(() => {
     let today = now(getLocalTimeZone())
     return new CalendarDate(today.year, today.month, today.day)
