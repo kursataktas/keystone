@@ -82,6 +82,19 @@ export function Field (props: FieldProps<typeof controller>) {
   const descriptionId = useSlotId([!!field.description, !!validationMessage])
   const messageId = useSlotId([!!field.description, !!validationMessage])
 
+  const cancelEditing = () => {
+    onChange?.({ kind: 'initial', isSet: value.isSet })
+    setTimeout(() => {
+      triggerRef.current?.focus()
+    }, 0)
+  }
+  const onEscape = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Escape' || value.kind !== 'editing') return
+    if (value.value === '' && value.confirm === '') {
+      cancelEditing()
+    }
+  }
+
   // reset when the user cancels, or when the form is submitted
   useEffect(() => {
     if (value.kind === 'initial') {
@@ -135,6 +148,7 @@ export function Field (props: FieldProps<typeof controller>) {
             isInvalid={!!validationMessage}
             onBlur={() => setTouched({ ...touched, value: true })}
             onChange={text => onChange({ ...value, value: text })}
+            onKeyDown={onEscape}
             placeholder="New"
             type={secureTextEntry ? 'password' : 'text'}
             value={value.value}
@@ -147,6 +161,7 @@ export function Field (props: FieldProps<typeof controller>) {
             isInvalid={!!validationMessage}
             onBlur={() => setTouched({ ...touched, confirm: true })}
             onChange={text => onChange({ ...value, confirm: text })}
+            onKeyDown={onEscape}
             placeholder="Confirm"
             type={secureTextEntry ? 'password' : 'text'}
             value={value.confirm}
@@ -162,14 +177,7 @@ export function Field (props: FieldProps<typeof controller>) {
               <Icon src={eyeIcon} />
               <Text isHidden={{ above: 'mobile' }}>Show</Text>
             </ToggleButton>
-            <ActionButton
-              onPress={() => {
-                onChange({ kind: 'initial', isSet: value.isSet })
-                setTimeout(() => {
-                  triggerRef.current?.focus()
-                }, 0)
-              }}
-            >
+            <ActionButton onPress={cancelEditing}>
               Cancel
             </ActionButton>
           </Flex>
