@@ -1,8 +1,11 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { Fragment } from 'react'
-import { jsx } from '@keystone-ui/core'
-import { FieldContainer, FieldDescription, FieldLabel, MultiSelect } from '@keystone-ui/fields'
+import { useListData } from '@react-stately/data'
+import React from 'react'
+
+import { Checkbox, CheckboxGroup } from '@keystar/ui/checkbox'
+import { Combobox, Item } from '@keystar/ui/combobox'
+import { TagGroup } from '@keystar/ui/tag'
+import { Text } from '@keystar/ui/typography'
+
 import {
   type CellComponent,
   type FieldController,
@@ -10,28 +13,98 @@ import {
   type FieldProps,
 } from '../../../../types'
 import { CellContainer, CellLink } from '../../../../admin-ui/components'
+import { VStack } from '@keystar/ui/layout'
 
-export const Field = ({ field, value, onChange, autoFocus }: FieldProps<typeof controller>) => {
+export const Field = (props: FieldProps<typeof controller>) => {
+  if (props.field.displayMode === 'checkboxes') {
+    return <CheckboxesField {...props} />
+  }
+
   return (
-    <FieldContainer>
-      <Fragment>
-        <FieldLabel htmlFor={field.path}>{field.label}</FieldLabel>
-        <FieldDescription id={`${field.path}-description`}>{field.description}</FieldDescription>
-        <MultiSelect
-          id={field.path}
-          isClearable
-          autoFocus={autoFocus}
-          options={field.options}
-          isDisabled={onChange === undefined}
-          onChange={newVal => {
-            onChange?.(newVal)
-          }}
-          value={value}
-          aria-describedby={field.description === null ? undefined : `${field.path}-description`}
-          portalMenu
-        />
-      </Fragment>
-    </FieldContainer>
+    <SelectField {...props} />
+  )
+}
+
+const SelectField = (props: FieldProps<typeof controller>) => {
+  const { field, onChange, value } = props
+
+  const tags = useListData({
+    initialItems: Array.from(value),
+    getKey: item => item.value,
+  })
+
+  console.log('SelectField', value)
+  
+  return (
+    <VStack gap="regular">
+      <Combobox
+        label={field.label}
+        description={field.description}
+        isReadOnly={onChange === undefined}
+        items={field.options.filter(option => !value.some(x => x.value === option.value))}
+        selectedKey={null}
+        onSelectionChange={key => {
+          if (key == null) return
+          const selectedOption = field.valuesToOptionsWithStringValues[key]
+          onChange?.([...value, selectedOption])
+          tags.append(selectedOption)
+        }}
+        width="auto"
+      >
+        {item => (
+          <Item key={item.value}>
+            {item.label}
+          </Item>
+        )}
+      </Combobox>
+      
+      <TagGroup
+        aria-label={field.label}
+        items={tags.items}
+        maxRows={2}
+        onRemove={(keys) => {
+          const key = keys.values().next().value
+          tags.remove(key)
+          onChange?.(value.filter(x => x.value !== key))
+        }}
+        renderEmptyState={() => (
+          <Text color="neutralSecondary" size='small'>
+            No items…
+          </Text>
+        )}
+      >
+        {item => (
+          <Item key={item.value}>
+            {item.label}
+          </Item>
+        )}
+      </TagGroup>
+    </VStack>
+  )
+}
+
+const CheckboxesField = (props: FieldProps<typeof controller>) => {
+  const { field, onChange, value } = props
+  return (
+    <CheckboxGroup
+      label={field.label}
+      description={field.description}
+      isReadOnly={onChange === undefined}
+      value={value.map(x => x.value)}
+      onChange={keys => {
+        onChange?.(keys.map(key => field.valuesToOptionsWithStringValues[key]))
+      }}
+    >
+      {field.options.map(option => (
+        <Checkbox
+          key={option.value}
+          value={option.value}
+          // isSelected={value.some(x => x.value === option.value)}
+        >
+          {option.label}
+        </Checkbox>
+      ))}
+    </CheckboxGroup>
   )
 }
 
@@ -45,6 +118,7 @@ Cell.supportsLinkTo = true
 export type AdminMultiSelectFieldMeta = {
   options: readonly { label: string, value: string | number }[]
   type: 'string' | 'integer' | 'enum'
+  displayMode: 'checkboxes' | 'select'
   defaultValue: string[] | number[]
 }
 
@@ -57,6 +131,7 @@ type Value = readonly Option[]
 export const controller = (
   config: Config
 ): FieldController<Value, Option[]> & {
+  displayMode: 'checkboxes' | 'select'
   options: Option[]
   type: 'string' | 'integer' | 'enum'
   valuesToOptionsWithStringValues: Record<string, Option>
@@ -74,6 +149,7 @@ export const controller = (
     config.fieldMeta.type === 'integer' ? parseInt(value) : value
 
   return {
+    displayMode: config.fieldMeta.displayMode,
     path: config.path,
     label: config.label,
     description: config.description,
