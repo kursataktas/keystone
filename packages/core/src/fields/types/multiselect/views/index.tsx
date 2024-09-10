@@ -1,8 +1,9 @@
-import { useListData } from '@react-stately/data'
+import { useFilter } from '@react-aria/i18n';
 import React from 'react'
 
 import { Checkbox, CheckboxGroup } from '@keystar/ui/checkbox'
 import { Combobox, Item } from '@keystar/ui/combobox'
+import { VStack } from '@keystar/ui/layout'
 import { TagGroup } from '@keystar/ui/tag'
 import { Text } from '@keystar/ui/typography'
 
@@ -13,27 +14,27 @@ import {
   type FieldProps,
 } from '../../../../types'
 import { CellContainer, CellLink } from '../../../../admin-ui/components'
-import { VStack } from '@keystar/ui/layout'
 
 export const Field = (props: FieldProps<typeof controller>) => {
   if (props.field.displayMode === 'checkboxes') {
-    return <CheckboxesField {...props} />
+    return <CheckboxesModeField {...props} />
   }
 
   return (
-    <SelectField {...props} />
+    <SelectModeField {...props} />
   )
 }
 
-const SelectField = (props: FieldProps<typeof controller>) => {
+const SelectModeField = (props: FieldProps<typeof controller>) => {
   const { field, onChange, value } = props
 
-  const tags = useListData({
-    initialItems: Array.from(value),
-    getKey: item => item.value,
-  })
+  const [filterText, setFilterText] = React.useState('')
+  const { contains } = useFilter({ sensitivity: 'base' });
 
-  console.log('SelectField', value)
+  const items = field.options.filter(option => !value.some(x => x.value === option.value))
+  const filteredItems = filterText
+    ? items.filter(item => contains(item.label, filterText))
+    : items
   
   return (
     <VStack gap="regular">
@@ -41,13 +42,14 @@ const SelectField = (props: FieldProps<typeof controller>) => {
         label={field.label}
         description={field.description}
         isReadOnly={onChange === undefined}
-        items={field.options.filter(option => !value.some(x => x.value === option.value))}
-        selectedKey={null}
+        items={filteredItems}
+        loadingState="idle"
+        onInputChange={setFilterText}
+        inputValue={filterText}
+        // selectedKey={null}
         onSelectionChange={key => {
           if (key == null) return
-          const selectedOption = field.valuesToOptionsWithStringValues[key]
-          onChange?.([...value, selectedOption])
-          tags.append(selectedOption)
+          onChange?.([...value, field.valuesToOptionsWithStringValues[key]])
         }}
         width="auto"
       >
@@ -59,16 +61,15 @@ const SelectField = (props: FieldProps<typeof controller>) => {
       </Combobox>
       
       <TagGroup
-        aria-label={field.label}
-        items={tags.items}
+        aria-label={`${field.label} selected items`}
+        items={value}
         maxRows={2}
         onRemove={(keys) => {
           const key = keys.values().next().value
-          tags.remove(key)
           onChange?.(value.filter(x => x.value !== key))
         }}
         renderEmptyState={() => (
-          <Text color="neutralSecondary" size='small'>
+          <Text color="neutralSecondary" size="small">
             No items…
           </Text>
         )}
@@ -83,7 +84,7 @@ const SelectField = (props: FieldProps<typeof controller>) => {
   )
 }
 
-const CheckboxesField = (props: FieldProps<typeof controller>) => {
+const CheckboxesModeField = (props: FieldProps<typeof controller>) => {
   const { field, onChange, value } = props
   return (
     <CheckboxGroup
@@ -96,11 +97,7 @@ const CheckboxesField = (props: FieldProps<typeof controller>) => {
       }}
     >
       {field.options.map(option => (
-        <Checkbox
-          key={option.value}
-          value={option.value}
-          // isSelected={value.some(x => x.value === option.value)}
-        >
+        <Checkbox key={option.value} value={option.value}>
           {option.label}
         </Checkbox>
       ))}
