@@ -1,6 +1,8 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 
+import { Text } from '@keystar/ui/typography'
+
 import { jsx } from '@keystone-ui/core'
 import { FieldContainer, FieldDescription, FieldLabel, TextInput } from '@keystone-ui/fields'
 import { useState } from 'react'
@@ -10,7 +12,6 @@ import {
   type FieldControllerConfig,
   type FieldProps,
 } from '../../../../types'
-import { CellLink, CellContainer } from '../../../../admin-ui/components'
 import { useFormattedInput } from '../../integer/views/utils'
 
 type Validation = {
@@ -124,11 +125,12 @@ export const Field = ({
   )
 }
 
-export const Cell: CellComponent = ({ item, field, linkTo }) => {
-  let value = item[field.path] + ''
-  return linkTo ? <CellLink {...linkTo}>{value}</CellLink> : <CellContainer>{value}</CellContainer>
+export const Cell: CellComponent = ({ field, item }) => {
+  let value = item[field.path]
+  return value != null
+    ? <Text>{value.toString()}</Text>
+    : null
 }
-Cell.supportsLinkTo = true
 
 function validate (
   state: Value,

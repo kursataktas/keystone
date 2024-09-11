@@ -1,9 +1,11 @@
-import { useFilter } from '@react-aria/i18n';
+import { useFilter, useListFormatter } from '@react-aria/i18n';
 import React from 'react'
 
 import { Checkbox, CheckboxGroup } from '@keystar/ui/checkbox'
 import { Combobox, Item } from '@keystar/ui/combobox'
+import { FieldLabel } from '@keystar/ui/field'
 import { VStack } from '@keystar/ui/layout'
+import { ListView } from '@keystar/ui/list-view'
 import { TagGroup } from '@keystar/ui/tag'
 import { Text } from '@keystar/ui/typography'
 
@@ -13,7 +15,6 @@ import {
   type FieldControllerConfig,
   type FieldProps,
 } from '../../../../types'
-import { CellContainer, CellLink } from '../../../../admin-ui/components'
 
 export const Field = (props: FieldProps<typeof controller>) => {
   if (props.field.displayMode === 'checkboxes') {
@@ -105,12 +106,22 @@ const CheckboxesModeField = (props: FieldProps<typeof controller>) => {
   )
 }
 
-export const Cell: CellComponent<typeof controller> = ({ item, field, linkTo }) => {
+export const Cell: CellComponent<typeof controller> = (props) => {
+  const { item, field } = props
+
+  const listFormatter = useListFormatter({ style: 'short', type: 'conjunction' })
   const value: readonly string[] | readonly number[] = item[field.path] ?? []
-  const label = value.map(value => field.valuesToOptionsWithStringValues[value].label).join(', ')
-  return linkTo ? <CellLink {...linkTo}>{label}</CellLink> : <CellContainer>{label}</CellContainer>
+  const labels = value.map(value => field.valuesToOptionsWithStringValues[value].label)
+  let cellContent = null
+
+  if (value.length > 3) {
+    cellContent = listFormatter.format([labels[0], `${value.length - 1} more`])
+  } else {
+    cellContent = listFormatter.format(labels)
+  }
+
+  return <Text>{cellContent}</Text>
 }
-Cell.supportsLinkTo = true
 
 export type AdminMultiSelectFieldMeta = {
   options: readonly { label: string, value: string | number }[]
@@ -163,5 +174,90 @@ export const controller = (
       return selectedOptions
     },
     serialize: value => ({ [config.path]: value.map(x => parseValue(x.value)) }),
+    filter: {
+      Filter (props) {
+        const { autoFocus, context, typeLabel, onChange, value, type, ...otherProps } = props
+
+        const densityLevels = ['spacious', 'regular', 'compact'] as const
+        const density = densityLevels[Math.min(Math.floor((optionsWithStringValues.length - 1) / 3), 2)]
+
+        const listView = (
+          <ListView
+            aria-label={typeLabel}
+            density={density}
+            items={optionsWithStringValues}
+            flex
+            minHeight={0}
+            maxHeight="100%"
+            selectionMode="multiple"
+            onSelectionChange={selection => {
+              if (selection === 'all') return // irrelevant for this case
+
+              onChange(optionsWithStringValues.filter(opt => selection.has(opt.value)))
+            }}
+            selectedKeys={value.map(x => x.value)}
+            {...otherProps}
+          >
+            {(item) => (
+              <Item key={item.value}>
+                {item.label}
+              </Item>
+            )}
+          </ListView>
+        )
+
+        if (context === 'edit') {
+          return (
+            <VStack
+              gap="medium"
+              flex
+              minHeight={0}
+              maxHeight="100%"
+            >
+              {/* intentionally not linked: the `ListView` has an explicit "aria-label" to avoid awkwardness with IDs and forked render */}
+              <FieldLabel elementType="span">{typeLabel}</FieldLabel>
+              {listView}
+            </VStack>
+          )
+        }
+
+        return listView
+      },
+      graphql: ({ type, value: options }) => ({
+        [config.path]: { [type === 'not_matches' ? 'notIn' : 'in']: options.map(x => x.value) },
+      }),
+      Label ({ type, value }) {
+        const listFormatter = useListFormatter({
+          style: 'short',
+          type: 'disjunction',
+        })
+
+        if (value.length === 0) {
+          return type === 'not_matches' ? `is set` : `is not set`
+        }
+
+        const labels = value.map(i => i.label)
+        const prefix = type === 'not_matches' ? `is not` : `is`
+
+        if (value.length === 1) {
+          return `${prefix} ${labels[0]}`
+        }
+        if (value.length === 2) {
+          return `${prefix} ${listFormatter.format(labels)}`
+        }
+
+        return `${prefix} ${listFormatter.format([labels[0], `${value.length - 1} more`])}`
+      },
+      types: {
+        matches: {
+          label: 'Matches',
+          initialValue: [],
+        },
+        not_matches: {
+          label: 'Does not match',
+          initialValue: [],
+        },
+      },
+    },
   }
 }

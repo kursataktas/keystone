@@ -8,9 +8,10 @@ import { Checkbox } from '@keystar/ui/checkbox'
 import { FieldLabel, FieldMessage } from '@keystar/ui/field'
 import { Icon } from '@keystar/ui/icon'
 import { eyeIcon } from '@keystar/ui/icon/icons/eyeIcon';
+import { asteriskIcon } from '@keystar/ui/icon/icons/asteriskIcon'
 import { Flex, VStack } from '@keystar/ui/layout'
 import { TextField } from '@keystar/ui/text-field'
-import { Text } from '@keystar/ui/typography'
+import { Text, VisuallyHidden } from '@keystar/ui/typography'
 
 import {
   type CellComponent,
@@ -18,7 +19,6 @@ import {
   type FieldControllerConfig,
   type FieldProps,
 } from '../../../../types'
-import { CellContainer } from '../../../../admin-ui/components'
 
 function validate (value: Value, validation: Validation, fieldLabel: string): string | undefined {
   if (value.kind === 'initial' && (value.isSet === null || value.isSet === true)) {
@@ -51,9 +51,6 @@ function validate (value: Value, validation: Validation, fieldLabel: string): st
   return undefined
 }
 
-function isSetText (isSet: null | undefined | boolean) {
-  return isSet == null ? 'Access denied' : isSet ? 'Is set' : 'Is not set'
-}
 function readonlyCheckboxProps (isSet: null | undefined | boolean) {
   const isIndeterminate = isSet == null
   const isSelected = isSet == null ? undefined : isSet
@@ -191,7 +188,16 @@ export function Field (props: FieldProps<typeof controller>) {
 }
 
 export const Cell: CellComponent = ({ item, field }) => {
-  return <CellContainer>{isSetText(item[field.path]?.isSet)}</CellContainer>
+  const value = !!item[field.path].isSet
+  return value
+    ? (
+      <div aria-label="is set" style={{display:'flex'}}>
+        <Icon src={asteriskIcon} size="small" />
+        <Icon src={asteriskIcon} size="small" />
+        <Icon src={asteriskIcon} size="small" />
+      </div>
+    )
+    : <VisuallyHidden>not set</VisuallyHidden>
 }
 
 type Validation = {

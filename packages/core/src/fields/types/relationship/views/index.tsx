@@ -1,16 +1,13 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-
-import Link from 'next/link'
-import { Fragment, useState } from 'react'
+import React, { Fragment, useState } from 'react'
 
 import { VStack } from '@keystar/ui/layout'
+import { TextLink } from '@keystar/ui/link'
 import { TagGroup, Item } from '@keystar/ui/tag'
-import { Text } from '@keystar/ui/typography'
+import { TextField } from '@keystar/ui/text-field'
+import { Numeral, Text } from '@keystar/ui/typography'
 
-import { jsx, Stack, useTheme } from '@keystone-ui/core'
-import { FieldDescription, FieldLegend } from '@keystone-ui/fields'
 import { DrawerController } from '@keystone-ui/modals'
+
 import type {
   CellComponent,
   FieldControllerConfig,
@@ -19,33 +16,28 @@ import type {
 } from '../../../../types'
 import { useList } from '../../../../admin-ui/context'
 import { gql, useQuery } from '../../../../admin-ui/apollo'
-import { CellContainer, CreateItemDrawer } from '../../../../admin-ui/components'
+import { CreateItemDrawer } from '../../../../admin-ui/components'
 
-import { RelationshipSelect } from './RelationshipSelect'
-import { RelationshipController } from './types'
 import { ContextualActions } from './ContextualActions'
 import { ComboboxMany } from './ComboboxMany'
 import { ComboboxSingle } from './ComboboxSingle'
+import { RelationshipController } from './types'
 
 export function Field (props: FieldProps<typeof controller>) {
   const { field, value, autoFocus, onChange } = props
 
   const foreignList = useList(field.refListKey)
-  const localList = useList(field.listKey)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   if (value.kind === 'count') {
     return (
-      <Stack as="fieldset" gap="medium">
-        <FieldLegend>{field.label}</FieldLegend>
-        <FieldDescription id={`${field.path}-description`}>{field.description}</FieldDescription>
-        <div>
-          {value.count === 1
-            ? `There is 1 ${foreignList.singular} `
-            : `There are ${value.count} ${foreignList.plural} `}
-          linked to this {localList.singular}
-        </div>
-      </Stack>
+      <TextField
+        autoFocus={autoFocus}
+        isReadOnly
+        label={field.label}
+        value={value.count.toString()}
+        width="alias.singleLineWidth"
+      />
     )
   }
 
@@ -153,42 +145,29 @@ export function Field (props: FieldProps<typeof controller>) {
 
 export const Cell: CellComponent<typeof controller> = ({ field, item }) => {
   const list = useList(field.refListKey)
-  const { colors } = useTheme()
 
   if (field.display === 'count') {
-    const count = item[`${field.path}Count`] ?? 0
-    return (
-      <CellContainer>
-        {count} {count === 1 ? list.singular : list.plural}
-      </CellContainer>
-    )
+    const count = item[`${field.path}Count`]
+    return count != null ? <Numeral value={count} abbreviate /> : null
   }
 
   const data = item[field.path]
-  const items = (Array.isArray(data) ? data : [data]).filter(item => item)
-  const displayItems = items.length < 5 ? items : items.slice(0, 3)
-  const overflow = items.length < 5 ? 0 : items.length - 3
-  const styles = {
-    color: colors.foreground,
-    textDecoration: 'none',
-
-    ':hover': {
-      textDecoration: 'underline',
-    },
-  } as const
+  const items = (Array.isArray(data) ? data : [data]).filter(Boolean)
+  const displayItems = items.length < 3 ? items : items.slice(0, 2)
+  const overflow = items.length < 3 ? 0 : items.length - 2
 
   return (
-    <CellContainer>
+    <Fragment>
       {displayItems.map((item, index) => (
         <Fragment key={item.id}>
           {!!index ? ', ' : ''}
-          <Link href={`/${list.path}/[id]`} as={`/${list.path}/${item.id}`} css={styles}>
+          <TextLink href={`/${list.path}/${item.id}`}>
             {item.label || item.id}
-          </Link>
+          </TextLink>
         </Fragment>
       ))}
       {overflow ? `, and ${overflow} more` : null}
-    </CellContainer>
+    </Fragment>
   )
 }
 
@@ -296,24 +275,15 @@ export function controller (
         }
         return (
           <ComboboxSingle
-              autoFocus={autoFocus}
-              isDisabled={onChange === undefined}
-              label={typeLabel}
-              labelField={refLabelField}
-              searchFields={refSearchFields}
-              list={foreignList}
-              isLoading={loading}
-              state={state}
-            />
-          // <RelationshipSelect
-          //   list={foreignList}
-          //   label={typeLabel}
-          //   labelField={refLabelField}
-          //   searchFields={refSearchFields}
-          //   isLoading={loading}
-          //   isDisabled={onChange === undefined}
-          //   state={state}
-          // />
+            autoFocus={autoFocus}
+            isDisabled={onChange === undefined}
+            label={typeLabel}
+            labelField={refLabelField}
+            searchFields={refSearchFields}
+            list={foreignList}
+            isLoading={loading}
+            state={state}
+          />
         )
       },
       graphql: ({ value }) => {

@@ -172,9 +172,6 @@ export type CellComponent<
 > = {
   (props: {
     item: Record<string, any>
-    linkTo: { href: string, as: string } | undefined
     field: ReturnType<FieldControllerFn>
   }): ReactElement | null
-
-  supportsLinkTo?: boolean
 }

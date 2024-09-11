@@ -4,7 +4,7 @@ import { ContextualHelp } from '@keystar/ui/contextual-help'
 import { NumberField } from '@keystar/ui/number-field'
 import { Content } from '@keystar/ui/slots'
 import { TextField } from '@keystar/ui/text-field'
-import { Heading, Text } from '@keystar/ui/typography'
+import { Heading, Numeral, Text } from '@keystar/ui/typography'
 
 import {
   type CellComponent,
@@ -12,7 +12,6 @@ import {
   type FieldControllerConfig,
   type FieldProps,
 } from '../../../../types'
-import { CellLink, CellContainer } from '../../../../admin-ui/components'
 
 export const Field = ({
   field,
@@ -70,11 +69,10 @@ export const Field = ({
   )
 }
 
-export const Cell: CellComponent = ({ item, field, linkTo }) => {
-  let value = item[field.path] + ''
-  return linkTo ? <CellLink {...linkTo}>{value}</CellLink> : <CellContainer>{value}</CellContainer>
+export const Cell: CellComponent = ({ field, item }) => {
+  const value = item[field.path]
+  return value != null ? <Numeral value={value} abbreviate /> : null
 }
-Cell.supportsLinkTo = true
 
 function validate (
   value: Value,

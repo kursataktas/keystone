@@ -98,14 +98,13 @@ export function BaseToolbar (props: { children: ReactNode }) {
       height="element.xlarge"
       insetBottom={0}
       marginTop="xlarge"
-      // paddingY={{
-      //   mobile: 'medium',
-      //   tablet: 'xlarge',
-      // }}
-      position={{
-        tablet: 'sticky',
-      }}
+      position={{ tablet: 'sticky' }}
       zIndex={20}
+      // cover focused fields
+      UNSAFE_style={{
+        marginInline: `calc(${tokenSchema.size.alias.focusRing} * -1)`,
+        paddingInline: tokenSchema.size.alias.focusRing,
+      }}
     >
       {props.children}
     </HStack>

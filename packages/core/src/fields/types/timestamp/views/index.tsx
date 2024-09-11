@@ -9,6 +9,7 @@ import { calendarClockIcon } from '@keystar/ui/icon/icons/calendarClockIcon'
 import { Grid } from '@keystar/ui/layout'
 import { TextField } from '@keystar/ui/text-field'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
+import { Text } from '@keystar/ui/typography'
 
 import {
   type CellComponent,
@@ -16,11 +17,7 @@ import {
   type FieldControllerConfig,
   type FieldProps,
 } from '../../../../types'
-import { CellContainer, CellLink } from '../../../../admin-ui/components'
-import {
-  type Value,
-  formatOutput,
-} from './utils'
+import { type Value } from './utils'
 
 export const Field = (props: FieldProps<typeof controller>) => {
   const { field, value, forceValidation, onChange } = props
@@ -125,15 +122,13 @@ function validate (
   return undefined
 }
 
-export const Cell: CellComponent = ({ item, field, linkTo }) => {
+export const Cell: CellComponent = ({ field, item }) => {
+  const dateFormatter = useDateFormatter({ dateStyle: 'medium', timeStyle: 'short' })
   let value = item[field.path]
-  return linkTo ? (
-    <CellLink {...linkTo}>{formatOutput(value)}</CellLink>
-  ) : (
-    <CellContainer>{formatOutput(value)}</CellContainer>
-  )
+  return value
+    ? <Text>{dateFormatter.format(new Date(value))}</Text>
+    : null
 }
-Cell.supportsLinkTo = true
 
 export type TimestampFieldMeta = {
   defaultValue: string | { kind: 'now' } | null
@@ -221,9 +216,7 @@ export const controller = (
           return label.toLocaleLowerCase()
         }
 
-        const parsedValue = parseAbsoluteToLocal(value)
-
-        return `${label.toLocaleLowerCase()} ${dateFormatter.format(parsedValue.toDate())}`
+        return `${label.toLocaleLowerCase()} ${dateFormatter.format(new Date(value))}`
       },
       types: {
         equals: {

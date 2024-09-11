@@ -1,7 +1,9 @@
 import React from 'react'
-import { Badge } from '@keystar/ui/badge'
+
 import { Checkbox } from '@keystar/ui/checkbox'
-import { Text } from '@keystar/ui/typography'
+import { Icon } from '@keystar/ui/icon'
+import { checkIcon } from '@keystar/ui/icon/icons/checkIcon'
+import { Text, VisuallyHidden } from '@keystar/ui/typography'
 
 import type {
   CellComponent,
@@ -26,11 +28,9 @@ export function Field ({ field, value, onChange, autoFocus }: FieldProps<typeof 
 
 export const Cell: CellComponent = ({ item, field }) => {
   const value = !!item[field.path]
-  return (
-    <Badge tone={value ? 'positive' : 'critical'}>
-      <Text>{value ? 'true' : 'false'}</Text>
-    </Badge>
-  )
+  return value
+    ? <Icon src={checkIcon} aria-label="true" />
+    : <VisuallyHidden>false</VisuallyHidden>
 }
 
 type CheckboxController = FieldController<boolean, boolean>

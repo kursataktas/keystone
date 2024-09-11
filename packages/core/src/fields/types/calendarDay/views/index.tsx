@@ -9,6 +9,7 @@ import { calendarClockIcon } from '@keystar/ui/icon/icons/calendarClockIcon'
 import { Grid } from '@keystar/ui/layout'
 import { TextField } from '@keystar/ui/text-field'
 import { TooltipTrigger, Tooltip } from '@keystar/ui/tooltip'
+import { Text } from '@keystar/ui/typography'
 
 import {
   type CellComponent,
@@ -16,7 +17,6 @@ import {
   type FieldControllerConfig,
   type FieldProps,
 } from '../../../../types'
-import { CellContainer, CellLink } from '../../../../admin-ui/components'
 
 export type Value =
   | { kind: 'create', value: string | null }
@@ -114,27 +114,12 @@ function validate (
   return undefined
 }
 
-export const Cell: CellComponent = ({ item, field, linkTo }) => {
+export const Cell: CellComponent = ({ field, item }) => {
+  const dateFormatter = useDateFormatter({ dateStyle: 'medium' })
   let value = item[field.path]
-  return linkTo ? (
-    <CellLink {...linkTo}>{formatOutput(value)}</CellLink>
-  ) : (
-    <CellContainer>{formatOutput(value)}</CellContainer>
-  )
-}
-Cell.supportsLinkTo = true
-
-function formatOutput (isoDateString: string | null) {
-  if (!isoDateString) {
-    return null
-  }
-  const date = new Date(`${isoDateString}T00:00Z`)
-  const dateInLocalTimezone = new Date(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate()
-  )
-  return dateInLocalTimezone.toLocaleDateString()
+  return value
+    ? <Text>{dateFormatter.format(new Date(value))}</Text>
+    : null
 }
 
 export type CalendarDayFieldMeta = {

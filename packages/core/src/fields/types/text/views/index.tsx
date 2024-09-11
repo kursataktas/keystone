@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { TextArea, TextField } from '@keystar/ui/text-field'
+import { Text } from '@keystar/ui/typography'
 
 import type {
   CellComponent,
@@ -7,7 +8,7 @@ import type {
   FieldControllerConfig,
   FieldProps,
 } from '../../../../types'
-import { CellContainer, CellLink, NullableFieldWrapper } from '../../../../admin-ui/components'
+import { NullableFieldWrapper } from '../../../../admin-ui/components'
 import type { TextFieldMeta } from '..'
 
 export function Field (props: FieldProps<typeof controller>) {
@@ -68,19 +69,17 @@ export function Field (props: FieldProps<typeof controller>) {
         value={value.inner.kind === 'value'
           ? value.inner.value
           : value.inner.prev}
-        // TODO: update the `TextField` min-height in "@keystar/ui"
-        // it should _feel_ like there’s space to write longform text
-        minHeight={isTextArea ? 'scale.1200' : undefined}
       />
     </NullableFieldWrapper>
   )
 }
 
-export const Cell: CellComponent = ({ item, field, linkTo }) => {
-  let value = item[field.path] + ''
-  return linkTo ? <CellLink {...linkTo}>{value}</CellLink> : <CellContainer>{value}</CellContainer>
+export const Cell: CellComponent = ({ field, item }) => {
+  let value = item[field.path]
+  return value != null
+    ? <Text>{value.toString()}</Text>
+    : null
 }
-Cell.supportsLinkTo = true
 
 type Config = FieldControllerConfig<TextFieldMeta>
 

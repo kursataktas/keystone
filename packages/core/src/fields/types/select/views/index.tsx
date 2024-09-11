@@ -7,6 +7,7 @@ import { VStack } from '@keystar/ui/layout'
 import { Item, Picker } from '@keystar/ui/picker'
 import { Radio, RadioGroup } from '@keystar/ui/radio'
 import { tokenSchema } from '@keystar/ui/style'
+import { Text } from '@keystar/ui/typography'
 
 import { NullableFieldWrapper } from '../../../../admin-ui/components'
 import { SegmentedControl } from './SegmentedControl'
@@ -17,7 +18,6 @@ import type {
   FieldControllerConfig,
   FieldProps,
 } from '../../../../types'
-import { CellContainer, CellLink } from '../../../../admin-ui/components'
 
 export const Field = (props: FieldProps<typeof controller>) => {
   const { autoFocus, field, forceValidation, onChange, value } = props
@@ -154,12 +154,11 @@ export const Field = (props: FieldProps<typeof controller>) => {
   )
 }
 
-export const Cell: CellComponent<typeof controller> = ({ item, field, linkTo }) => {
+export const Cell: CellComponent<typeof controller> = ({ item, field }) => {
   let value = item[field.path] + ''
   const label = field.options.find(x => x.value === value)?.label
-  return linkTo ? <CellLink {...linkTo}>{label}</CellLink> : <CellContainer>{label}</CellContainer>
+  return <Text>{label}</Text>
 }
-Cell.supportsLinkTo = true
 
 export type AdminSelectFieldMeta = {
   options: readonly { label: string, value: string | number }[]

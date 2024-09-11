@@ -10,7 +10,6 @@ import {
   type CellComponent,
   type FieldProps,
 } from '@keystone-6/core/types'
-import { CellContainer, CellLink } from '@keystone-6/core/admin-ui/components'
 
 import { DocumentEditor } from './DocumentEditor'
 import { ForceValidationProvider } from './DocumentEditor/utils-hooks'
@@ -54,17 +53,13 @@ function serialize (nodes: Node[]) {
   return nodes.map((n: Node) => Node.string(n)).join('\n')
 }
 
-export const Cell: CellComponent = ({ item, field, linkTo }) => {
+export const Cell: CellComponent = ({ field, item }) => {
   const value = item[field.path]?.document
   if (!value) return null
-  const plainText = serialize(value)
-  const cutText = plainText.length > 100 ? plainText.slice(0, 100) + '...' : plainText
-  return linkTo ? (
-    <CellLink {...linkTo}>{cutText}</CellLink>
-  ) : (
-    <CellContainer>{cutText}</CellContainer>
-  )
+
+  // FIXME: @keystar/ui `Text` should be used here, but it's not currently
+  // available in this package
+  return <span>{serialize(value).slice(0, 60)}</span>
 }
-Cell.supportsLinkTo = true
 
 export const allowedExportsOnCustomViews = ['componentBlocks']

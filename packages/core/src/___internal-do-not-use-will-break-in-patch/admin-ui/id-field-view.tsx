@@ -1,26 +1,25 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
+import React from 'react'
 
 import { TextField } from '@keystar/ui/text-field'
+import { Text } from '@keystar/ui/typography'
 
-import { jsx } from '@keystone-ui/core'
 import type {
   CellComponent,
   FieldController,
   FieldControllerConfig,
   IdFieldConfig,
 } from '../../types'
-import { CellLink, CellContainer } from '../../admin-ui/components'
 
 export function Field () {
   return null
 }
 
-export const Cell: CellComponent = ({ item, field, linkTo }) => {
-  let value = item[field.path] + ''
-  return linkTo ? <CellLink {...linkTo}>{value}</CellLink> : <CellContainer>{value}</CellContainer>
+export const Cell: CellComponent = ({ field, item }) => {
+  let value = item[field.path]
+  return value != null
+    ? <Text>{value.toString()}</Text>
+    : null
 }
-Cell.supportsLinkTo = true
 
 export function controller (
   config: FieldControllerConfig<IdFieldConfig>

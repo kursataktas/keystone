@@ -396,9 +396,6 @@ function ListTable ({
           overflowMode="truncate"
           onSelectionChange={setSelectedKeys}
           selectedKeys={selectedKeys}
-          // onRowAction={key => {
-          //   router.push(`/${list.path}/${key}`)
-          // }}
           renderEmptyState={() => isConstrained ? (
             <EmptyState
               icon={searchXIcon}
@@ -413,12 +410,6 @@ function ListTable ({
             />
           )}
           flex
-          UNSAFE_className={css({
-            // FIXME: needs to be fixed in @keystar/ui
-            '[role="row"]:not([aria-selected]) .css-btatqr': {
-              background: 'transparent'
-            },
-          })}
         >
           <TableHeader columns={columns}>
             {({ label, id, ...options }) =>  (
@@ -432,24 +423,15 @@ function ListTable ({
               return (
                 <Row href={`/${list.path}/${row?.id}`}>
                   {key => {
-                    // TODO: FIXME
-                    // const field = list.fields[key]
+                    const field = list.fields[key]
+                    const CellContent = field.views.Cell
                     return (
                       <Cell>
-                        <Text>{row[key]?.toString()}</Text>
-                        {/* <CellValue
-                          field={field.controller}
-                          item={itemForField}
-                          linkTo={undefined}
-                          // linkTo={
-                          //   i === 0 && CellValue.supportsLinkTo
-                          //     ? {
-                          //         href: `/${list.path}/[id]`,
-                          //         as: `/${list.path}/${encodeURIComponent(itemId)}`,
-                          //       }
-                          //     : undefined
-                          // }
-                        /> */}
+                        {CellContent ? (
+                          <CellContent field={field.controller} item={row} />
+                        ) : (
+                          <Text>{row[key]?.toString()}</Text>
+                        )}
                       </Cell>
                     )
                   }}
