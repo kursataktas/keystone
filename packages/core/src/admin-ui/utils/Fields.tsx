@@ -152,9 +152,12 @@ export function Fields ({
   }
 
   // TODO: improve the empty state
+  // - probably shouldn't render anything in the sidebar
   return (
     <VStack gap="xlarge">
-      {rendered.length === 0 ? 'There are no fields that you can read or edit' : rendered}
+      {rendered.length === 0 ? (
+        <Text color="neutralTertiary">No fields matching access…</Text>
+      ) : rendered}
     </VStack>
   )
 }
