@@ -1,5 +1,7 @@
 import React from 'react'
+
 import { Combobox, Item } from '@keystar/ui/combobox'
+import { css } from '@keystar/ui/style'
 
 import { type ListMeta } from '../../../../types'
 import { useApolloQuery } from './useApolloQuery'
@@ -82,6 +84,11 @@ export const ComboboxMany = ({
       }}
       minWidth="alias.singleLineWidth"
       width="auto"
+      UNSAFE_className={css({
+        // This should probably be addressed in @keystar/ui/combobox
+        // - the mobile variant should respect the `width` prop
+        '[role="button"]': { width: 'auto' }
+      })}
     >
       {(item) => <Item key={item[idFieldAlias]}>{item[labelFieldAlias] || item[idFieldAlias]}</Item>}
     </Combobox>
