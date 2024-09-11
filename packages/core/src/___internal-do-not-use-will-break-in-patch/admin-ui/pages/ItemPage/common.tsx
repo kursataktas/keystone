@@ -6,7 +6,7 @@ import React, {
 import { useRouter } from 'next/router'
 
 import { Breadcrumbs, Item } from '@keystar/ui/breadcrumbs'
-import { HStack } from '@keystar/ui/layout'
+import { Grid, HStack } from '@keystar/ui/layout'
 import { breakpointQueries, css, tokenSchema } from '@keystar/ui/style'
 import { Heading, Text } from '@keystar/ui/typography'
 
@@ -61,7 +61,7 @@ export function ColumnLayout (props: HTMLAttributes<HTMLDivElement>) {
 
           [breakpointQueries.above.tablet]: {
             gridTemplateColumns: `2fr minmax(${tokenSchema.size.scale[3600]}, 1fr)`,
-            gridTemplateAreas: '"main sidebar" "toolbar ."',
+            gridTemplateAreas: '"main sidebar" "toolbar toolbar"',
           },
         })}
         {...props}
@@ -78,6 +78,10 @@ export function StickySidebar (props: HTMLAttributes<HTMLDivElement>) {
         marginTop: tokenSchema.size.space.xlarge,
 
         [breakpointQueries.above.tablet]: {
+          alignSelf: 'start',
+          marginBottom: tokenSchema.size.space.xlarge,
+          // sync with toolbar height
+          paddingBottom: tokenSchema.size.element.xlarge,
           position: 'sticky',
           top: tokenSchema.size.space.xlarge,
         },
@@ -89,24 +93,40 @@ export function StickySidebar (props: HTMLAttributes<HTMLDivElement>) {
 
 export function BaseToolbar (props: { children: ReactNode }) {
   return (
-    <HStack
-      alignItems="center"
+    <Grid
       backgroundColor="surface"
-      borderTop="neutral"
-      gap="regular"
+      columns="subgrid"
       gridArea="toolbar"
-      height="element.xlarge"
       insetBottom={0}
       marginTop="xlarge"
       position={{ tablet: 'sticky' }}
       zIndex={20}
-      // cover focused fields
-      UNSAFE_style={{
-        marginInline: `calc(${tokenSchema.size.alias.focusRing} * -1)`,
-        paddingInline: tokenSchema.size.alias.focusRing,
-      }}
+      UNSAFE_className={css({
+        // fuzzy mask sidebar fields, which slide behind the un-bordered portion
+        // of the sticky toolbar
+        [breakpointQueries.above.tablet]: {
+          '&::after': {
+            boxShadow: `0 -4px 4px 1px ${tokenSchema.color.background.surface}`,
+            content: '""',
+          },
+        }
+      })}
     >
-      {props.children}
-    </HStack>
+      <HStack
+        alignItems="center"
+        borderTop="neutral"
+        gap="regular"
+        height="element.xlarge"
+        UNSAFE_className={css({
+          // stretch horizontally to ensure field focus-rings are covered
+          [breakpointQueries.above.mobile]: {
+            marginInline: `calc(${tokenSchema.size.alias.focusRing} * -1)`,
+            paddingInline: tokenSchema.size.alias.focusRing,
+          }
+        })}
+      >
+        {props.children}
+      </HStack>
+    </Grid>
   )
 }

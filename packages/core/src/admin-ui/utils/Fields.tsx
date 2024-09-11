@@ -3,6 +3,7 @@
 
 import { useSlotId } from '@react-aria/utils'
 
+import { VStack } from '@keystar/ui/layout'
 import { Text } from '@keystar/ui/typography'
 
 import { jsx, Stack, useTheme } from '@keystone-ui/core'
@@ -152,9 +153,9 @@ export function Fields ({
 
   // TODO: improve the empty state
   return (
-    <Stack gap="xlarge">
+    <VStack gap="xlarge">
       {rendered.length === 0 ? 'There are no fields that you can read or edit' : rendered}
-    </Stack>
+    </VStack>
   )
 }
 

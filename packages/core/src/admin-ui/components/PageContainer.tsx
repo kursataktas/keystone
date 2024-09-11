@@ -89,7 +89,16 @@ const Content = (props: HTMLAttributes<HTMLElement>) => {
       overflow="hidden auto"
       paddingX="xlarge"
       position="relative"
-      UNSAFE_className={css({ WebkitOverflowScrolling: 'touch' })}
+      UNSAFE_className={css({
+        WebkitOverflowScrolling: 'touch',
+        
+        // prevent focused form fields being hidden behind the sticky toolbar
+        // this is particularly important for textareas that may expand
+        [breakpointQueries.above.mobile]: {
+          // must be kept in-sync with the toolbar height
+          scrollPaddingBlockEnd: tokenSchema.size.element.xlarge,
+        }
+      })}
       {...props}
     />
   )
