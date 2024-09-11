@@ -382,16 +382,14 @@ function ListTable ({
     }
   })
 
-
   return (
     <Fragment>
-
       <ActionBarContainer flex minHeight="scale.3000">
         <TableView
           aria-labelledby={LIST_PAGE_TITLE_ID}
           selectionMode={selectionMode}
           onSortChange={onSortChange}
-          sortDescriptor={parseSortQuery(router.query.sortBy)}
+          sortDescriptor={parseSortQuery(router.query.sortBy) || parseInitialSort(list.initialSort)}
           density="spacious"
           overflowMode="truncate"
           onSelectionChange={setSelectedKeys}
@@ -504,9 +502,9 @@ function ListTable ({
   )
 }
 
-function parseSortQuery (queryString?: string | string[]): SortDescriptor {
+function parseSortQuery (queryString?: string | string[]): SortDescriptor | undefined {
   if (!queryString) {
-    return {}
+    return undefined
   }
 
   if (Array.isArray(queryString)) {
@@ -518,6 +516,17 @@ function parseSortQuery (queryString?: string | string[]): SortDescriptor {
   const direction = queryString.startsWith('-') ? 'ascending' : 'descending'
 
   return { column, direction }
+}
+
+function parseInitialSort (sort?: { field: string, direction: 'ASC' | 'DESC' } | null): SortDescriptor | undefined {
+  if (!sort) {
+    return undefined
+  }
+
+  return {
+    column: sort.field,
+    direction: sort.direction === 'ASC' ? 'ascending' : 'descending',
+  }
 }
 
 function DeleteItemsDialog (props: { items: Set<Key>, listKey: string, refetch: () => void }) {
