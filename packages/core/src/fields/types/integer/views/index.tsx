@@ -71,7 +71,7 @@ export const Field = ({
 
 export const Cell: CellComponent = ({ field, item }) => {
   const value = item[field.path]
-  return value != null ? <Numeral value={value} abbreviate /> : null
+  return value != null ? <Numeral value={value} /> : null
 }
 
 function validate (
