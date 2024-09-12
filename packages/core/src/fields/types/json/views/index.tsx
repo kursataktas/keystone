@@ -1,9 +1,8 @@
 import React from 'react'
 
-import { Icon } from '@keystar/ui/icon'
-import { bracesIcon } from '@keystar/ui/icon/icons/bracesIcon'
 import { css, tokenSchema } from '@keystar/ui/style'
 import { TextArea } from '@keystar/ui/text-field'
+import { Text } from '@keystar/ui/typography'
 
 import {
   type CellComponent,
@@ -37,9 +36,9 @@ export const Field = (props: FieldProps<typeof controller>) => {
 }
 
 export const Cell: CellComponent = ({ item, field }) => {
-  const value = !!item[field.path]
+  const value = item[field.path]
   return value
-    ? <Icon src={bracesIcon} aria-label="has value" />
+    ? <Text>{JSON.stringify(value)}</Text>
     : null
 }
 
