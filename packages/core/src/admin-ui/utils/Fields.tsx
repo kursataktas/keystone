@@ -3,6 +3,7 @@
 
 import { useSlotId } from '@react-aria/utils'
 
+import { textCursorInputIcon } from '@keystar/ui/icon/icons/textCursorInputIcon'
 import { VStack } from '@keystar/ui/layout'
 import { Text } from '@keystar/ui/typography'
 
@@ -14,6 +15,7 @@ import type {
   FieldMeta,
   Item,
 } from '../../types'
+import { EmptyState } from '../components/EmptyState'
 import { type Value } from '.'
 
 type RenderFieldProps = {
@@ -151,13 +153,21 @@ export function Fields ({
     rendered.push(renderedFields[fieldKey])
   }
 
-  // TODO: improve the empty state
-  // - probably shouldn't render anything in the sidebar
+  // TODO: not sure what to do about the sidebar case. i think it's fine to
+  // just render nothing for now, but we should revisit this.
+  if (rendered.length === 0 && position === 'form') {
+    return (
+      <EmptyState
+        icon={textCursorInputIcon}
+        title="No fields"
+        message="There are no fields matching access."
+      />
+    )
+  }
+
   return (
     <VStack gap="xlarge">
-      {rendered.length === 0 ? (
-        <Text color="neutralTertiary">No fields matching access…</Text>
-      ) : rendered}
+      {rendered}
     </VStack>
   )
 }
