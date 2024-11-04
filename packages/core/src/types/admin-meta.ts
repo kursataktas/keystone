@@ -145,8 +145,8 @@ export type Item = {
 export type FieldEnvironment = 'create-dialog' | 'create-page' | 'edit-page'
 
 export type FieldProps<FieldControllerFn extends (...args: any) => FieldController<any, any>> = {
-  /** The environment in which a field is rendered. */
   autoFocus?: boolean
+  /** The environment in which a field is rendered. */
   environment: FieldEnvironment
   field: ReturnType<FieldControllerFn>
   /**
