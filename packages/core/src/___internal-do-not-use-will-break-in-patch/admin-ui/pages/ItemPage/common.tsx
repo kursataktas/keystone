@@ -120,6 +120,7 @@ export function BaseToolbar (props: { children: ReactNode }) {
         UNSAFE_className={css({
           // stretch horizontally to ensure field focus-rings are covered
           [breakpointQueries.above.mobile]: {
+            backgroundColor: tokenSchema.color.background.surface,
             marginInline: `calc(${tokenSchema.size.alias.focusRing} * -1)`,
             paddingInline: tokenSchema.size.alias.focusRing,
           }

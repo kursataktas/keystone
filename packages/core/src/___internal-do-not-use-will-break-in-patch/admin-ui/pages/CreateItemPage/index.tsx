@@ -72,7 +72,7 @@ function CreateItemPage (props: CreateItemPageProps) {
                 />
               )}
 
-              <Fields {...createItem.props} />
+              <Fields environment='create-page' {...createItem.props} />
             </VStack>
 
             <BaseToolbar>

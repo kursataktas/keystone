@@ -1,12 +1,11 @@
 import React, { Fragment, useState } from 'react'
 
+import { DialogContainer } from '@keystar/ui/dialog'
 import { VStack } from '@keystar/ui/layout'
 import { TextLink } from '@keystar/ui/link'
 import { TagGroup, Item } from '@keystar/ui/tag'
 import { TextField } from '@keystar/ui/text-field'
 import { Numeral, Text } from '@keystar/ui/typography'
-
-import { DrawerController } from '@keystone-ui/modals'
 
 import type {
   CellComponent,
@@ -16,7 +15,7 @@ import type {
 } from '../../../../types'
 import { useList } from '../../../../admin-ui/context'
 import { gql, useQuery } from '../../../../admin-ui/apollo'
-import { CreateItemDrawer } from '../../../../admin-ui/components'
+import { CreateItemDialog } from '../../../../admin-ui/components'
 
 import { ContextualActions } from './ContextualActions'
 import { ComboboxMany } from './ComboboxMany'
@@ -27,7 +26,7 @@ export function Field (props: FieldProps<typeof controller>) {
   const { field, value, autoFocus, onChange } = props
 
   const foreignList = useList(field.refListKey)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [dialogIsOpen, setDialogOpen] = useState(false)
 
   if (value.kind === 'count') {
     return (
@@ -44,7 +43,7 @@ export function Field (props: FieldProps<typeof controller>) {
   return (
     <Fragment>
       <VStack gap="medium">
-        <ContextualActions {...props}>
+        <ContextualActions onAdd={() => setDialogOpen(true)} {...props}>
           {value.kind === 'many' ? (
             <ComboboxMany
               key={field.path}
@@ -116,28 +115,27 @@ export function Field (props: FieldProps<typeof controller>) {
       </VStack>
 
       {onChange !== undefined && (
-        <DrawerController isOpen={isDrawerOpen}>
-          <CreateItemDrawer
-            listKey={foreignList.key}
-            onClose={() => {
-              setIsDrawerOpen(false)
-            }}
-            onCreate={val => {
-              setIsDrawerOpen(false)
-              if (value.kind === 'many') {
-                onChange({
-                  ...value,
-                  value: [...value.value, val],
-                })
-              } else if (value.kind === 'one') {
-                onChange({
-                  ...value,
-                  value: val,
-                })
-              }
-            }}
-          />
-        </DrawerController>
+        <DialogContainer onDismiss={() => setDialogOpen(false)}>
+          {dialogIsOpen && (
+            <CreateItemDialog
+              listKey={foreignList.key}
+              onCreate={val => {
+                setDialogOpen(false)
+                if (value.kind === 'many') {
+                  onChange({
+                    ...value,
+                    value: [...value.value, val],
+                  })
+                } else if (value.kind === 'one') {
+                  onChange({
+                    ...value,
+                    value: val,
+                  })
+                }
+              }}
+            />
+          )}
+        </DialogContainer>
       )}
     </Fragment>
   )

@@ -11,6 +11,7 @@ import { jsx, Stack, useTheme } from '@keystone-ui/core'
 import { memo, type ReactNode, useContext, useId, useMemo } from 'react'
 import { ButtonContext } from '@keystone-ui/button'
 import type {
+  FieldEnvironment,
   FieldGroupMeta,
   FieldMeta,
   Item,
@@ -19,15 +20,17 @@ import { EmptyState } from '../components/EmptyState'
 import { type Value } from '.'
 
 type RenderFieldProps = {
+  autoFocus?: boolean
+  environment: FieldEnvironment
   field: FieldMeta
-  value: unknown
+  forceValidation?: boolean
   itemValue: Item
   onChange?(value: (value: Value) => Value): void
-  autoFocus?: boolean
-  forceValidation?: boolean
+  value: unknown
 }
 
 const RenderField = memo(function RenderField ({
+  environment,
   field,
   value,
   itemValue,
@@ -37,6 +40,7 @@ const RenderField = memo(function RenderField ({
 }: RenderFieldProps) {
   return (
     <field.views.Field
+      environment={environment}
       field={field.controller}
       onChange={useMemo(() => {
         if (onChange === undefined) return undefined
@@ -53,18 +57,27 @@ const RenderField = memo(function RenderField ({
 })
 
 type FieldsProps = {
-  fields: Record<string, FieldMeta>
-  groups?: FieldGroupMeta[]
-  value: Value
+  /**
+   * The environment in which the fields are being rendered. Certain fields may
+   * render differently depending on context, for example the relationship field
+   * does not support "add" behavior in the create dialog.
+   * 
+   * @default 'edit-page'
+  */
+  environment?: FieldEnvironment
   fieldModes?: Record<string, 'hidden' | 'edit' | 'read'> | null
   fieldPositions?: Record<string, 'form' | 'sidebar'> | null
+  fields: Record<string, FieldMeta>
   forceValidation: boolean
-  position?: 'form' | 'sidebar'
+  groups?: FieldGroupMeta[]
   invalidFields: ReadonlySet<string>
   onChange(value: (value: Value) => Value): void
+  position?: 'form' | 'sidebar'
+  value: Value
 }
 
 export function Fields ({
+  environment = 'edit-page',
   fields,
   value,
   fieldModes = null,
@@ -109,6 +122,7 @@ export function Fields ({
         fieldKey,
         <RenderField
           key={fieldKey}
+          environment={environment}
           field={field}
           value={val.value}
           itemValue={value}

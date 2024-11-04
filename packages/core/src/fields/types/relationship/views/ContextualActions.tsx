@@ -11,7 +11,11 @@ import { useList } from '../../../../admin-ui/context'
 import type { FieldProps } from '../../../../types'
 import type { RelationshipController } from './types'
 
-export function ContextualActions (props: PropsWithChildren<FieldProps<() => RelationshipController>>) {
+type RelationshipProps = {
+  onAdd: () => void;
+} & FieldProps<() => RelationshipController>
+
+export function ContextualActions (props: PropsWithChildren<RelationshipProps>) {
   const { children, ...otherProps } = props
   return (
     <Grid gap="regular" alignItems="end" columns="minmax(0, 1fr) auto">
@@ -21,15 +25,15 @@ export function ContextualActions (props: PropsWithChildren<FieldProps<() => Rel
   )
 }
 
-function ContextualActionsMenu (props: FieldProps<() => RelationshipController>) {
-  const { field, onChange, value } = props
+function ContextualActionsMenu (props: RelationshipProps) {
+  const { environment, field, onAdd, onChange, value } = props
 
   const foreignList = useList(field.refListKey)
   const relatedItem = useRelatedItem(props)
 
   const items = useMemo(() => {
     let result = []
-    let allowCreate = !field.hideCreate && onChange !== undefined
+    let allowCreate = !field.hideCreate && onChange !== undefined && environment !== 'create-dialog'
 
     if (allowCreate) {
       result.push({
@@ -51,16 +55,10 @@ function ContextualActionsMenu (props: FieldProps<() => RelationshipController>)
   const onAction = (key: Key) => {
     switch (key) {
       case 'add': {
-        alert('TODO: "create" modal')
+        onAdd();
         break
       }
     }
-  }
-
-  // if there are no items, and the user has no ability to add items, don't
-  // render the menu
-  if (onChange === undefined && items.length === 0) {
-    return null
   }
 
   return (
