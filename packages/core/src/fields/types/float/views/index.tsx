@@ -89,7 +89,7 @@ function FloatInput ({
         if (raw === '') {
           return null
         }
-        let parsed = parseFloat(raw)
+        const parsed = parseFloat(raw)
         if (Number.isFinite(parsed)) {
           return parsed
         }
@@ -189,10 +189,10 @@ export const controller = (
           <TextInput
             onChange={event => {
               if (type === 'in' || type === 'not_in') {
-                onChange(event.target.value.replace(/[^\d\.,\s-]/g, ''))
+                onChange(event.target.value.replace(/[^\d.,\s-]/g, ''))
                 return
               }
-              onChange(event.target.value.replace(/[^\d\.\s-]/g, ''))
+              onChange(event.target.value.replace(/[^\d.\s-]/g, ''))
             }}
             value={value}
             autoFocus={autoFocus}

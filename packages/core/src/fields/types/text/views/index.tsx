@@ -113,7 +113,7 @@ function validate (value: TextValue, validation: Validation, fieldLabel: string)
 
   const val = value.inner.value
 
-  let messages: string[] = []
+  const messages: string[] = []
   if (validation.length.min !== null && val.length < validation.length.min) {
     if (validation.length.min === 1) {
       messages.push(`${fieldLabel} must not be empty`)

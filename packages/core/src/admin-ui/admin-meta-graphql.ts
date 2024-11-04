@@ -127,7 +127,7 @@ export type StaticAdminMetaQuery = {
         })[]
         graphql: {
           names: GraphQLNames
-        },
+        }
 
         initialSort: ({
           __typename: 'KeystoneAdminUISort'
