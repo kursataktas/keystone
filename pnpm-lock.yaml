@@ -718,6 +718,9 @@ importers:
 
   examples/custom-admin-ui-navigation:
     dependencies:
+      '@keystar/ui':
+        specifier: ^0.7.6
+        version: 0.7.12(next@14.2.17(@babel/core@7.26.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@keystone-6/core':
         specifier: ^6.3.1
         version: link:../../packages/core
@@ -737,6 +740,9 @@ importers:
 
   examples/custom-admin-ui-pages:
     dependencies:
+      '@keystar/ui':
+        specifier: ^0.7.6
+        version: 0.7.12(next@14.2.17(@babel/core@7.26.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@keystone-6/core':
         specifier: ^6.3.1
         version: link:../../packages/core
@@ -1271,6 +1277,9 @@ importers:
       '@graphql-tools/schema':
         specifier: ^9.0.0
         version: 9.0.19(graphql@16.9.0)
+      '@keystar/ui':
+        specifier: ^0.7.6
+        version: 0.7.12(next@14.2.17(@babel/core@7.26.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@keystone-6/core':
         specifier: ^6.3.1
         version: link:../../packages/core
@@ -1896,6 +1905,9 @@ importers:
       '@babel/runtime':
         specifier: ^7.24.7
         version: 7.26.0
+      '@keystar/ui':
+        specifier: ^0.7.6
+        version: 0.7.12(next@14.2.17(@babel/core@7.26.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@keystone-ui/button':
         specifier: workspace:^
         version: link:../../design-system/packages/button
@@ -2009,6 +2021,12 @@ importers:
       '@hapi/iron':
         specifier: ^7.0.0
         version: 7.0.1
+      '@internationalized/date':
+        specifier: ^3.5.5
+        version: 3.5.6
+      '@keystar/ui':
+        specifier: ^0.7.10
+        version: 0.7.12(next@14.2.17(@babel/core@7.26.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@keystone-ui/button':
         specifier: workspace:^
         version: link:../../design-system/packages/button
@@ -2060,6 +2078,18 @@ importers:
       '@prisma/migrate':
         specifier: 5.22.0
         version: 5.22.0(@prisma/generator-helper@5.22.0)(@prisma/internals@5.22.0)
+      '@react-aria/i18n':
+        specifier: ^3.12.1
+        version: 3.12.3(react@18.3.1)
+      '@react-aria/label':
+        specifier: ^3.7.10
+        version: 3.7.12(react@18.3.1)
+      '@react-aria/utils':
+        specifier: ^3.25.1
+        version: 3.25.3(react@18.3.1)
+      '@react-stately/data':
+        specifier: ^3.11.6
+        version: 3.11.7(react@18.3.1)
       '@sindresorhus/slugify':
         specifier: ^1.1.2
         version: 1.1.2
@@ -18739,7 +18769,7 @@ snapshots:
   camel-case@4.1.2:
     dependencies:
       pascal-case: 3.1.2
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   camelcase-keys@6.2.2:
     dependencies:
@@ -18760,7 +18790,7 @@ snapshots:
   capital-case@1.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
       upper-case-first: 2.0.2
 
   capture-exit@2.0.0:
@@ -19019,7 +19049,7 @@ snapshots:
   constant-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
       upper-case: 2.0.2
 
   content-disposition@0.5.4:
@@ -20509,7 +20539,7 @@ snapshots:
   header-case@2.0.4:
     dependencies:
       capital-case: 1.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   hex-rgb@4.3.0: {}
 
@@ -22963,7 +22993,7 @@ snapshots:
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   parent-module@1.0.1:
     dependencies:
@@ -23038,7 +23068,7 @@ snapshots:
   pascal-case@3.1.2:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   pascalcase@0.1.1: {}
 
@@ -23065,7 +23095,7 @@ snapshots:
   path-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   path-exists@3.0.0: {}
 
@@ -24004,7 +24034,7 @@ snapshots:
   sentence-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
       upper-case-first: 2.0.2
 
   serve-static@1.16.2:
