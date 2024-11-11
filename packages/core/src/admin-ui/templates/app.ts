@@ -100,7 +100,7 @@ function getLazyMetadataQuery (
       adminMeta {
         lists {
           key
-          isHidden
+          hideNavigation
           fields {
             path
             createView {
